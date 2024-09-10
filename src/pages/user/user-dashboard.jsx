@@ -49,20 +49,17 @@ const UserDashboard = () => {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Avatar className="h-20 w-20">
+              <Avatar className="h-10 w-10 lg:h-20 lg:w-20">
                 <AvatarImage src={userData.avatar} alt={userData.name} />
                 <AvatarFallback>{userData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
               </Avatar>
               <div>
-                <CardTitle className="text-3xl font-bold text-green-600">Bienvenida, {userData.name}</CardTitle>
-                <CardDescription className="text-lg text-green-600">
-                  Tu Eco-Dashboard Personal
-                </CardDescription>
+                <CardTitle className="text-lg lg:text-3xl font-bold text-green-600">Bienvenida, {userData.name}</CardTitle>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-500">Tu Eco-Score</p>
-              <p className={`text-4xl font-bold ${getEcoScoreColor(userData.ecoScore)}`}>
+              <p className="text-xs lg:text-sm font-medium text-gray-500">Eco-Score</p>
+              <p className={`text-lg lg:text-4xl font-bold  ${getEcoScoreColor(userData.ecoScore)}`}>
                 {userData.ecoScore}
               </p>
             </div>
@@ -154,36 +151,6 @@ const UserDashboard = () => {
               </CardContent>
             </Card>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-green-800">Próximos Desafíos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <TrendingUp className="h-6 w-6 text-blue-500" />
-                    <span className="text-gray-700">Reduce tu huella de carbono un 5% más</span>
-                  </div>
-                  <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-                    En Progreso
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-6 w-6 text-purple-500" />
-                    <span className="text-gray-700">Participa en el próximo evento de limpieza comunitaria</span>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="bg-purple-100 text-purple-800 border-purple-300">
-                    Próximamente
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </CardContent>
       </Card>
     </div>)

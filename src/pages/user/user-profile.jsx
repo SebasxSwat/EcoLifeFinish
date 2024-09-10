@@ -137,7 +137,7 @@ const UserProfile = () => {
                       <Input
                         id="current-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Ingresa tu contraseña actual" />
+                        placeholder="Contraseña actual" />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}

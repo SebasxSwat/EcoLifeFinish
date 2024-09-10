@@ -1,41 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import {
   IconArrowLeft,
   IconBrandTabler,
-  IconSettings,
+  IconTrophy,
   IconUserBolt,
+  IconNews
 } from "@tabler/icons-react";
 import { DarkMode } from "../ui/darkMode";
 import { motion } from "framer-motion";
 import UserDashboard from "@/pages/user/user-dashboard";
 import UserProfile from "@/pages/user/user-profile";
 import UserChallenges from "@/pages/user/user-challenges";
+import News from "@/pages/user/noticias";
 
 export function SidebarDemoUser() {
   const [open, setOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState("dashboard");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Default dark mode
+  useEffect(() => {
+    document.documentElement.classList.add("dark"); // Añadir modo oscuro al cargar
+  }, []);
+
+  useEffect(() => {
+    // Detect screen size changes
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768); // Consider mobile if width <= 768px
+    };
+
+    handleResize(); // Check on mount
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const handleOptionClick = (id) => {
+    setCurrentPage(id);
+    if (isMobile) {
+      setOpen(false); // Close sidebar on mobile when an option is selected
+    }
+  };
 
   const links = [
     {
-      label: "Dashboard",
-      id: "dashboard",
+      label: "Home",
+      id: "home",
       icon: (
         <IconBrandTabler className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
     },
     {
-      label: "Profile",
-      id: "profile",
+      label: "Perfil",
+      id: "perfil",
       icon: (
         <IconUserBolt className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
     },
     {
-      label: "Challenge",
-      id: "challenge",
+      label: "Desafios",
+      id: "desafio",
       icon: (
-        <IconSettings className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
+        <IconTrophy className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
+      ),
+    },
+    {
+      label: "Noticias",
+      id: "noticias",
+      icon: (
+        <IconNews className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
     },
     {
@@ -47,35 +83,15 @@ export function SidebarDemoUser() {
     },
   ];
 
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [userOpen, setUserOpen] = useState(false);
-
-  const handleProfileClick = () => {
-    setProfileOpen(!profileOpen);
-    setUserOpen(false);
-    setCurrentPage("profile");
-  };
-
-  const handleUserClick = () => {
-    setUserOpen(!userOpen);
-    setProfileOpen(false);
-  };
-
-  const handleSubMenuClick = (id) => {
-    setProfileOpen(false);
-    setUserOpen(false);
-    setCurrentPage(id);
-  };
-
   const renderMainContent = () => {
     switch (currentPage) {
-      case "profile":
+      case "perfil":
         return <UserProfile />;
-      case "challenge":
+      case "desafio":
         return <UserChallenges />;
-      case "average-carbon-footprint":
-        return <AverageCarbonFootprint />;
-      case "dashboard":
+      case "noticias":
+        return <News/>;
+      case "home":
       default:
         return <UserDashboard />;
     }
@@ -88,39 +104,13 @@ export function SidebarDemoUser() {
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-5">
-              {links.map((link, idx) =>
-                link.submenu ? (
-                  <div key={idx}>
-                    <SidebarLink
-                      link={{
-                        label: link.label,
-                        icon: link.icon,
-                      }}
-                      onClick={() => {
-                        link.label === "Profile"
-                          ? handleProfileClick()
-                          : handleUserClick();
-                      }}
-                    />
-                    {((profileOpen && link.label === "Profile") ||
-                      (userOpen && link.label === "User")) &&
-                      link.submenu.map((subLink, subIdx) => (
-                        <SidebarLink
-                          key={subIdx}
-                          link={subLink}
-                          className="ml-6"
-                          onClick={() => handleSubMenuClick(subLink.id)}
-                        />
-                      ))}
-                  </div>
-                ) : (
-                  <SidebarLink
-                    key={idx}
-                    link={link}
-                    onClick={() => setCurrentPage(link.id)}
-                  />
-                )
-              )}
+              {links.map((link, idx) => (
+                <SidebarLink
+                  key={idx}
+                  link={link}
+                  onClick={() => handleOptionClick(link.id)}
+                />
+              ))}
             </div>
           </div>
 

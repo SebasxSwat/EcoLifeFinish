@@ -1,9 +1,9 @@
 "use client";
 
-import UserRegistration from "@/pages/user-registration";
+import { SidebarDemoUser } from "@/components/user/SidebarDemo-User";
 
 export default function Home() {
   return (
-    <UserRegistration/>
+    <SidebarDemoUser/>
   );
 }
