@@ -5,16 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useRouter } from 'next/router'
+
 
 export function CuestionarioHuellaCarbonoJsx({ userId }) {
-  const router = useRouter()
   const [respuestas, setRespuestas] = useState({
     consumoElectrico: '',
     tipoTransporte: '',
     consumoCarne: '',
     reciclaje: '',
-  })
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
