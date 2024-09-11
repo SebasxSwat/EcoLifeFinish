@@ -23,12 +23,30 @@ const UserChallenges = () => {
     ]
   });
 
-  const handleCompleteChallenge = (challenge) => {
-    setChallenges(prevChallenges => ({
-      ...prevChallenges,
-      completed: [...prevChallenges.completed, challenge],
-      available: prevChallenges.available.filter(c => c.id !== challenge.id)
-    }));
+  const handleCompleteChallenge = async (challenge) => {
+    try {
+      const response = await fetch(`/api/challenges/${challenge.id}/complete`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${yourAuthToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setChallenges(prevChallenges => ({
+          ...prevChallenges,
+          completed: [...prevChallenges.completed, challenge],
+          available: prevChallenges.available.filter(c => c.id !== challenge.id)
+        }));
+        updateEcoScore(data.eco_score);
+      } else {
+        console.error('Error al completar el desafío');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const renderChallengeCard = (challenge, type) => (

@@ -12,7 +12,7 @@ import { motion } from "framer-motion";
 import UserDashboard from "@/pages/user/user-dashboard";
 import UserProfile from "@/pages/user/user-profile";
 import UserChallenges from "@/pages/user/user-challenges";
-import News from "@/pages/user/noticias";
+import { NoticiasEcologicas } from "@/pages/user/noticias-ecologicas";
 
 export function SidebarDemoUser() {
   const [open, setOpen] = useState(false);
@@ -90,7 +90,7 @@ export function SidebarDemoUser() {
       case "desafio":
         return <UserChallenges />;
       case "noticias":
-        return <News/>;
+        return <NoticiasEcologicas/>;
       case "home":
       default:
         return <UserDashboard />;
@@ -100,7 +100,7 @@ export function SidebarDemoUser() {
   return (
     <div className="rounded-md flex flex-col md:flex-row w-screen text-lg font-bold bg-gray-100 dark:bg-neutral-800 flex-1 max-w-8xl mx-auto border border-neutral-200 dark:border-black overflow-hidden min-h-screen">
       <Sidebar open={open} setOpen={setOpen} className="w-96">
-        <SidebarBody className="justify-between gap-10 bg-gray-800 dark:bg-neutral-900 text-white dark:text-white border-2 border-neutral-700 dark:border-neutral-600 rounded-lg">
+        <SidebarBody className="justify-between gap-10 bg-gray-500 dark:bg-neutral-900 text-white dark:text-white border-2 border-neutral-700 dark:border-neutral-600 rounded-lg">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-5">
@@ -136,7 +136,7 @@ export const Logo = () => {
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-bold text-2xl text-green-600 dark:text-white text-center whitespace-pre"
+        className="font-bold text-2xl text-white dark:text-white text-center whitespace-pre"
       >
         EcoLife
       </motion.span>
