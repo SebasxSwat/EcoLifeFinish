@@ -1,9 +1,9 @@
 "use client";
 
-import { SidebarDemoUser } from "@/components/user/SidebarDemo-User";
+import { CuestionarioHuellaCarbonoJsx } from "@/pages/user/cuestionario-huella-carbono";
 
 export default function Home() {
   return (
-    <SidebarDemoUser/>
+    <CuestionarioHuellaCarbonoJsx/>
   );
 }
