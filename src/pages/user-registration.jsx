@@ -1,168 +1,146 @@
-'use client'
+import React, { useState } from 'react'
+import { useRouter } from 'next/router'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Leaf, AlertCircle } from 'lucide-react'
+import { postData } from '@/components/lib/api'
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Leaf, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
-
-const UserRegistration = () => {
+export default function Registro() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  })
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const router = useRouter()
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault()
+    setError('')
+    setSuccess(false)
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
+      setError('Las contraseñas no coinciden')
+      return
     }
 
     try {
-      const response = await fetch('/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
+      const response = await postData('/auth/register', {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      })
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Handle successful registration (e.g., redirect to login page)
-        console.log('Registration successful');
+      if (response.success) {
+        setSuccess(true)
+        setTimeout(() => router.push('/carbon-footprint-questionnaire'), 2000)
       } else {
-        setError(data.message || 'Registration failed');
+        setError(response.message || 'Error en el registro')
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError('Ocurrió un error. Por favor, inténtalo de nuevo.')
     }
-  };
+  }
 
   return (
-    (<div
-      className="min-h-screen bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className=" rounded-lg shadow-xl p-8 max-w-md w-full">
-        <div className="flex items-center justify-center mb-8">
-          <Leaf className="text-green-500 h-12 w-12 mr-2" />
-          <h1 className="text-3xl font-bold text-green-800">EcoLife</h1>
-        </div>
-        <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Join Our Eco-Community</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-            <div className="relative">
-              <User
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={18} />
-              <input
-                type="text"
+    <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-green-800 flex items-center">
+            <Leaf className="h-6 w-6 mr-2" />
+            Registro en EcoLife
+          </CardTitle>
+          <CardDescription>
+            Únete a nuestra comunidad y comienza tu viaje eco-friendly
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Nombre de usuario</Label>
+              <Input
                 id="username"
                 name="username"
+                type="text"
+                required
                 value={formData.username}
                 onChange={handleChange}
-                className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                placeholder="Choose a username"
-                required />
+                placeholder="Elige un nombre de usuario"
+              />
             </div>
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <div className="relative">
-              <Mail
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={18} />
-              <input
-                type="email"
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo electrónico</Label>
+              <Input
                 id="email"
                 name="email"
+                type="email"
+                required
                 value={formData.email}
                 onChange={handleChange}
-                className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                placeholder="Your email address"
-                required />
+                placeholder="tu@email.com"
+              />
             </div>
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <div className="relative">
-              <Lock
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={18} />
-              <input
-                type={showPassword ? "text" : "password"}
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
                 id="password"
                 name="password"
+                type="password"
+                required
                 value={formData.password}
                 onChange={handleChange}
-                className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                placeholder="Create a strong password"
-                required />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+                placeholder="Crea una contraseña segura"
+              />
             </div>
-          </div>
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-            <div className="relative">
-              <Lock
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={18} />
-              <input
-                type="password"
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+              <Input
                 id="confirmPassword"
                 name="confirmPassword"
+                type="password"
+                required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                placeholder="Confirm your password"
-                required />
+                placeholder="Confirma tu contraseña"
+              />
             </div>
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            type="submit"
-            className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300">
-            Join EcoLife
-          </motion.button>
-        </form>
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <a href="/login" className="font-medium text-green-600 hover:text-green-500">
-            Log in
-          </a>
-        </p>
-      </motion.div>
-    </div>)
-  );
-};
-
-export default UserRegistration;
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {success && (
+              <Alert className="bg-green-100 text-green-800 border-green-300">
+                <Leaf className="h-4 w-4" />
+                <AlertTitle>¡Registro exitoso!</AlertTitle>
+                <AlertDescription>Tu cuenta ha sido creada. Serás redirigido al cuestionario de huella de carbono.</AlertDescription>
+              </Alert>
+            )}
+            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
+              Registrarse
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter>
+          <p className="text-sm text-gray-600">
+            ¿Ya tienes una cuenta?{' '}
+            <a href="/login" className="text-green-600 hover:underline">
+              Inicia sesión aquí
+            </a>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  )
+}
