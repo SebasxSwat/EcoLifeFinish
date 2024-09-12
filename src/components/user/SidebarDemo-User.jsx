@@ -19,15 +19,13 @@ export function SidebarDemoUser() {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [isMobile, setIsMobile] = useState(false);
 
-  // Default dark mode
   useEffect(() => {
-    document.documentElement.classList.add("dark"); // Añadir modo oscuro al cargar
+    document.documentElement.classList.add("dark");
   }, []);
 
   useEffect(() => {
-    // Detect screen size changes
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); // Consider mobile if width <= 768px
+      setIsMobile(window.innerWidth <= 768); 
     };
 
     handleResize(); // Check on mount

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'  // Asegúrate de importar desde 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,20 +32,22 @@ export function Login() {
         body: JSON.stringify(formData),
       })
 
-      const data = await response.json()
-
-      if (response.ok) {
-        localStorage.setItem('token', data.access_token)
-        if (data.is_admin) {
-          router.push('/admin/dashboard')
-        } else {
-          router.push('/user/dashboard')
-        }
-      } else {
+      if (!response.ok) {
+        const data = await response.json()
         setError(data.message || 'Login failed')
+        return
+      }
+
+      const data = await response.json()
+      localStorage.setItem('token', data.access_token)
+
+      // Cambia la redirección aquí
+      if (data.is_admin) {
+        router.push('/admin/dashboard')
+      } else {
+        router.push('/user/sidebar')  // Cambia esto según la ruta de tu componente SidebarDemoUser
       }
     } catch (err) {
-      console.error(err)
       setError('An error occurred. Please try again.')
     }
   }
@@ -108,5 +110,5 @@ export function Login() {
         </CardFooter>
       </Card>
     </div>
-  );
+  )
 }
