@@ -1,36 +1,36 @@
-import React, { useState } from 'react'
-import { useRouter } from 'next/router'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Leaf, AlertCircle } from 'lucide-react'
-import { postData } from '@/components/lib/api'
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation'; 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Leaf } from 'lucide-react';
+import { postData } from '@/components/lib/api';
 
-export default function Registro() {
+export default function UserRegistration() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-  })
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-  const router = useRouter()
+  });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setSuccess(false)
+    e.preventDefault();
+    setError('');
+    setSuccess(false);
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden')
-      return
+      setError('Las contraseñas no coinciden');
+      return;
     }
 
     try {
@@ -38,18 +38,19 @@ export default function Registro() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-      })
+      });
 
       if (response.success) {
-        setSuccess(true)
-        setTimeout(() => router.push('/carbon-footprint-questionnaire'), 2000)
+        setSuccess(true);
+        setTimeout(() => router.push('/login'), 2000); // Redirige al login
       } else {
-        setError(response.message || 'Error en el registro')
+        setError(response.message || 'Error en el registro');
       }
     } catch (err) {
-      setError('Ocurrió un error. Por favor, inténtalo de nuevo.')
+      console.error('Error en la solicitud:', err);
+      setError('Ocurrió un error. Por favor, inténtalo de nuevo.');
     }
-  }
+  };
 
   return (
     <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
@@ -115,7 +116,6 @@ export default function Registro() {
             </div>
             {error && (
               <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -124,7 +124,7 @@ export default function Registro() {
               <Alert className="bg-green-100 text-green-800 border-green-300">
                 <Leaf className="h-4 w-4" />
                 <AlertTitle>¡Registro exitoso!</AlertTitle>
-                <AlertDescription>Tu cuenta ha sido creada. Serás redirigido al cuestionario de huella de carbono.</AlertDescription>
+                <AlertDescription>Tu cuenta ha sido creada. Serás redirigido al inicio de sesión.</AlertDescription>
               </Alert>
             )}
             <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
@@ -142,5 +142,5 @@ export default function Registro() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
