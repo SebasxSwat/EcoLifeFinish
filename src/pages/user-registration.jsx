@@ -42,7 +42,7 @@ export default function UserRegistration() {
 
       if (response.success) {
         setSuccess(true);
-        setTimeout(() => router.push('/login'), 2000); // Redirige al login
+        setTimeout(() => router.push('/login'), 2000); 
       } else {
         setError(response.message || 'Error en el registro');
       }

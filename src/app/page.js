@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { fetchData } from '@/components/lib/api';
-import Registro from '@/pages/user-registration';
+import { Login } from '@/pages/login';
 
 function Page() {
   const [data, setData] = useState(null);
@@ -25,7 +25,7 @@ function Page() {
 
   return (
     <div>
-      <Registro/>
+      <Login/>
     </div>
   );
 }

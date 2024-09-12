@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'  // Asegúrate de importar desde 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Leaf, AlertCircle } from 'lucide-react'
 
-export function LoginJsx() {
+export function Login() {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -26,7 +26,7 @@ export function LoginJsx() {
     setError('')
 
     try {
-      const response = await fetch('http://localhost:5000/auth/login', {
+      const response = await fetch('http://localhost:8080/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -45,13 +45,13 @@ export function LoginJsx() {
         setError(data.message || 'Login failed')
       }
     } catch (err) {
+      console.error(err)
       setError('An error occurred. Please try again.')
     }
   }
 
   return (
-    (<div
-      className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
+    <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-green-800 flex items-center">
@@ -107,6 +107,6 @@ export function LoginJsx() {
           </p>
         </CardFooter>
       </Card>
-    </div>)
+    </div>
   );
 }
