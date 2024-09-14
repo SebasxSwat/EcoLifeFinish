@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,8 +9,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Leaf } from 'lucide-react';
 import { postData } from '@/components/lib/api';
+import { Link } from 'react-router-dom';
 
-export default function UserRegistration() {
+const UserRegistration = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -42,7 +45,7 @@ export default function UserRegistration() {
 
       if (response.success) {
         setSuccess(true);
-        setTimeout(() => router.push('/login'), 2000); 
+        setTimeout(() => router.push('/login'), 2000);
       } else {
         setError(response.message || 'Error en el registro');
       }
@@ -53,7 +56,8 @@ export default function UserRegistration() {
   };
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
+    (<div
+      className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-green-800 flex items-center">
@@ -75,8 +79,7 @@ export default function UserRegistration() {
                 required
                 value={formData.username}
                 onChange={handleChange}
-                placeholder="Elige un nombre de usuario"
-              />
+                placeholder="Elige un nombre de usuario" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Correo electrónico</Label>
@@ -87,8 +90,7 @@ export default function UserRegistration() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="tu@email.com"
-              />
+                placeholder="tu@email.com" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Contraseña</Label>
@@ -99,8 +101,7 @@ export default function UserRegistration() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Crea una contraseña segura"
-              />
+                placeholder="Crea una contraseña segura" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
@@ -111,8 +112,7 @@ export default function UserRegistration() {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder="Confirma tu contraseña"
-              />
+                placeholder="Confirma tu contraseña" />
             </div>
             {error && (
               <Alert variant="destructive">
@@ -135,12 +135,14 @@ export default function UserRegistration() {
         <CardFooter>
           <p className="text-sm text-gray-600">
             ¿Ya tienes una cuenta?{' '}
-            <a href="/login" className="text-green-600 hover:underline">
+            <Link to="/login" className="text-green-600 hover:underline">
               Inicia sesión aquí
-            </a>
+            </Link>
           </p>
         </CardFooter>
       </Card>
-    </div>
+    </div>)
   );
 }
+
+export default UserRegistration;
