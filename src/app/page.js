@@ -8,6 +8,7 @@ import LandingPage from "@/pages/landing/app-page";
 import UserRegistration from "@/pages/components-user-registration";
 import Loading from "@/components/ui/loading";
 import { SidebarDemoUser } from "@/components/user/SidebarDemo-User";
+import { CuestionarioHuellaCarbono } from "@/pages/user/cuestionario";
 
 function Page() {
   const [data, setData] = useState(null);
@@ -36,6 +37,7 @@ function Page() {
           <Route path="/login" element={<Login/>}/>
           <Route path="/register" element={<UserRegistration/>}/>
           <Route path="/dashboardUser" element={<SidebarDemoUser/>}/>
+          <Route path="/cuestionario" element={<CuestionarioHuellaCarbono/>}/>
         </Routes>
       </Router>
     </div>

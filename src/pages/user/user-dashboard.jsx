@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -9,58 +10,73 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 const UserDashboard = () => {
   const [userData, setUserData] = useState({
-    name: "Ana García",
-    avatar: "https://i.pravatar.cc/150?img=5",
-    ecoScore: 85,
-    carbonFootprint: 7.2,
-    treesPlanted: 12,
-    wasteRecycled: 145,
-    waterSaved: 2800,
-    energySaved: 320,
-    badges: ["Eco Warrior", "Tree Hugger", "Water Saver"],
-    activities: [
-      { date: "2023-05-01", score: 75 },
-      { date: "2023-05-08", score: 80 },
-      { date: "2023-05-15", score: 78 },
-      { date: "2023-05-22", score: 82 },
-      { date: "2023-05-29", score: 85 },
-    ]
+    username: '',
+    eco_score: 0,
+    carbon_footprint: 0,
+    treesPlanted: 0,
+    wasteRecycled: 0,
+    waterSaved: 0,
+    activities: [],
+    badges: []
   });
 
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    // Simulating API call
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+        const response = await fetch('http://localhost:8080/auth/user', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          setUserData({
+            username: data.username,
+            eco_score: data.eco_score,
+            carbon_footprint: data.carbon_footprint,
+            treesPlanted: data.trees_planted || 0,
+            wasteRecycled: data.waste_recycled || 0,
+            waterSaved: data.water_saved || 0,
+            activities: data.activities || [],
+            badges: data.badges || []
+          });
+        } else {
+          console.error("Error al obtener los datos del usuario");
+        }
+      } catch (error) {
+        console.error("Error al hacer la solicitud:", error);
+      }
+    };
+  
+    fetchUserData();
   }, []);
 
   const getEcoScoreColor = (score) => {
-    if (score >= 80) return "text-green-500";
-    if (score >= 60) return "text-yellow-500";
-    return "text-red-500";
+    if (score >= 80) return 'text-green-600';
+    if (score >= 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   return (
-    (<div
-      className="container mx-auto p-4 bg-gradient-to-br to-blue-50 min-h-screen">
+    <div className="container mx-auto p-4 bg-gradient-to-br to-blue-50 min-h-screen">
       <Card className="w-full max-w-6xl mx-auto shadow-lg">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Avatar className="h-10 w-10 lg:h-20 lg:w-20">
-                <AvatarImage src={userData.avatar} alt={userData.name} />
-                <AvatarFallback>{userData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                <AvatarImage src="/placeholder.svg" alt={userData.username} />
+                <AvatarFallback>{userData.username.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
-                <CardTitle className="text-lg lg:text-3xl font-bold text-green-600">Bienvenida, {userData.name}</CardTitle>
+                <CardTitle className="text-lg lg:text-3xl font-bold text-green-600">Bienvenido, {userData.username}</CardTitle>
               </div>
             </div>
             <div className="text-right">
               <p className="text-xs lg:text-sm font-medium text-gray-500">Eco-Score</p>
-              <p className={`text-lg lg:text-4xl font-bold  ${getEcoScoreColor(userData.ecoScore)}`}>
-                {userData.ecoScore}
+              <p className={`text-lg lg:text-4xl font-bold ${getEcoScoreColor(userData.eco_score)}`}>
+                {userData.eco_score}
               </p>
             </div>
           </div>
@@ -72,11 +88,11 @@ const UserDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-400">Huella de Carbono</p>
-                    <p className="text-2xl font-bold text-green-600">{userData.carbonFootprint} ton</p>
+                    <p className="text-2xl font-bold text-green-600">{userData.carbon_footprint} ton</p>
                   </div>
                   <Leaf className="h-10 w-10 text-green-500" />
                 </div>
-                <Progress value={(userData.carbonFootprint / 20) * 100} className="mt-4" />
+                <Progress value={(userData.carbon_footprint / 20) * 100} className="mt-4" />
               </CardContent>
             </Card>
             <Card>
@@ -124,12 +140,10 @@ const UserDashboard = () => {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={userData.activities}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" 
-                      tick={{ fontSize: 12 }}/>
-                      <YAxis 
-                       tick={{ fontSize: 14 }}/>
+                      <XAxis dataKey="date" tick={{ fontSize: 12 }}/>
+                      <YAxis tick={{ fontSize: 14 }}/>
                       <Tooltip />
-                      <Line type="monotone" dataKey="score" stroke="#10B981" strokeWidth={2 } />
+                      <Line type="monotone" dataKey="score" stroke="#10B981" strokeWidth={2} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -153,7 +167,7 @@ const UserDashboard = () => {
           </div>
         </CardContent>
       </Card>
-    </div>)
+    </div>
   );
 };
 
