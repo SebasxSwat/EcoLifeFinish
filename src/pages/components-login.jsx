@@ -16,6 +16,7 @@ import {
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Leaf, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ const Login = () => {
     password: "",
   });
   const [error, setError] = useState("");
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,6 +33,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setTimeout(() => {
+      navigate('/dashboardUser');
+    }, 1000);
 
     try {
       const response = await fetch("http://localhost:8080/auth/login", {
@@ -49,11 +53,6 @@ const Login = () => {
       const data = await response.json();
       localStorage.setItem("token", data.access_token);
 
-      if (data.is_admin) {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/user/sidebar");
-      }
     } catch (err) {
       setError("An error occurred. Please try again.");
     }

@@ -7,6 +7,7 @@ import Login from "@/pages/components-login";
 import LandingPage from "@/pages/landing/app-page";
 import UserRegistration from "@/pages/components-user-registration";
 import Loading from "@/components/ui/loading";
+import { SidebarDemoUser } from "@/components/user/SidebarDemo-User";
 
 function Page() {
   const [data, setData] = useState(null);
@@ -34,6 +35,7 @@ function Page() {
           <Route path="/" element={<LandingPage/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/register" element={<UserRegistration/>}/>
+          <Route path="/dashboardUser" element={<SidebarDemoUser/>}/>
         </Routes>
       </Router>
     </div>
