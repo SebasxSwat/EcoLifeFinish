@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -17,9 +16,7 @@ import {
   Recycle,
   Droplet,
   Award,
-  TrendingUp,
-  Calendar,
-} from "lucide-react";
+  } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -35,8 +32,9 @@ const UserDashboard = () => {
   const dataUser = jwtDecode(localStorage.getItem("token"));
 
   const [userData, setUserData] = useState({
+    name: dataUser.name,
     username: dataUser.username,
-    eco_score: dataUser.user_id,
+    eco_score: dataUser.eco_score,
     carbon_footprint: 0,
     treesPlanted: 0,
     wasteRecycled: 0,
@@ -49,7 +47,7 @@ const UserDashboard = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8080/auth/user", {
+        const response = await fetch("http://localhost:8080/auth/login", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -91,14 +89,14 @@ const UserDashboard = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Avatar className="h-10 w-10 lg:h-20 lg:w-20">
-                <AvatarImage src="/placeholder.svg" alt={userData.username} />
+                <AvatarImage src="/placeholder.svg" alt={userData.name} />
                 <AvatarFallback>
-                  {userData.username.charAt(0).toUpperCase()}
+                  {userData.name.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <CardTitle className="text-lg lg:text-3xl font-bold text-green-600">
-                  Bienvenido/a, {userData.username}
+                  Bienvenid@, {userData.name}
                 </CardTitle>
               </div>
             </div>

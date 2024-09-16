@@ -20,9 +20,9 @@ import { SuccessAlert, ErrorAlert } from "@/components/ui/alert-register";
 
 const UserRegistration = () => {
   const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    telefono: "",
+    name: "",
+    lastname: "",
+    phone: "",
     username: "",
     email: "",
     password: "",
@@ -40,6 +40,9 @@ const UserRegistration = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000);
 
     if (formData.password !== formData.confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -51,16 +54,15 @@ const UserRegistration = () => {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        nombre: formData.nombre,
-        apellido: formData.apellido,
-        telefono: formData.telefono,
+        name: formData.name,
+        lastname: formData.lastname,
+        phone: formData.phone,
       });
 
       if (response.success) {
-        setSuccess("Registro exitoso. Ahora puedes iniciar sesión.");
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
+        setSuccess("Registro exitoso. Redirigiendo al inicio de sesión...");
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        navigate("/login");
       } else {
         setError(response.message || "Error en el registro");
       }
@@ -73,51 +75,40 @@ const UserRegistration = () => {
   return (
     <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-4xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-green-800 flex items-center">
-            <Leaf className="h-6 w-6 mr-2" />
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold text-green-800 flex items-center justify-center">
+            <Leaf className="h-8 w-8 mr-2" />
             Registro en EcoLife
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-lg">
             Únete a nuestra comunidad y comienza tu viaje eco-friendly
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="nombre">Nombre</Label>
+                <Label htmlFor="name">Nombre</Label>
                 <Input
-                  id="nombre"
-                  name="nombre"
+                  id="name"
+                  name="name"
                   type="text"
                   required
-                  value={formData.nombre}
+                  value={formData.name}
                   onChange={handleChange}
                   placeholder="Tu nombre"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="apellido">Apellido</Label>
+                <Label htmlFor="lastname">Apellido</Label>
                 <Input
-                  id="apellido"
-                  name="apellido"
+                  id="lastname"
+                  name="lastname"
                   type="text"
                   required
-                  value={formData.apellido}
+                  value={formData.lastname}
                   onChange={handleChange}
                   placeholder="Tu apellido"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="telefono">Teléfono</Label>
-                <Input
-                  id="telefono"
-                  name="telefono"
-                  type="tel"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  placeholder="Tu número de teléfono"
                 />
               </div>
               <div className="space-y-2">
@@ -145,6 +136,17 @@ const UserRegistration = () => {
                 />
               </div>
               <div className="space-y-2">
+                <Label htmlFor="phone">Teléfono</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Tu número de teléfono"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
                 <Input
                   id="password"
@@ -169,17 +171,19 @@ const UserRegistration = () => {
                 />
               </div>
             </div>
-            <Button
-              type="submit"
-              className="w-full bg-green-600 hover:bg-green-700 mt-6"
-            >
-              Registrarse
-            </Button>
+            <div className="flex justify-center mt-6">
+              <Button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 px-8 py-2"
+              >
+                Registrarse
+              </Button>
+            </div>
           </form>
           {success && <SuccessAlert message={success} className="font-bold mt-4" />}
           {error && <ErrorAlert message={error} className="font-bold mt-4" />}
         </CardContent>
-        <CardFooter>
+        <CardFooter className="justify-center">
           <p className="text-sm text-gray-600">
             ¿Ya tienes una cuenta?{" "}
             <Link to="/login" className="text-green-600 hover:underline">

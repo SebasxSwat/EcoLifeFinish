@@ -1,25 +1,30 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { User, Mail, Phone, MapPin, Lock, Eye, EyeOff } from 'lucide-react';
-import { jwtDecode } from 'jwt-decode';
+import { User, Mail, Phone, MapPin, Lock, Eye, EyeOff } from "lucide-react";
+import { jwtDecode } from "jwt-decode";
 
 const UserProfile = () => {
   const dataUser = jwtDecode(localStorage.getItem("token"));
 
   const [user, setUser] = useState({
+    name: dataUser.name,
     username: dataUser.username,
     email: dataUser.email,
-    phone: "+34 123 456 789",
-    location: "Madrid, España",
-    avatar: "https://i.pravatar.cc/150?img=5",
+    phone: dataUser.phone,
   });
 
   const [editMode, setEditMode] = useState(false);
@@ -34,17 +39,23 @@ const UserProfile = () => {
   };
 
   return (
-    (<div
-      className="container mx-auto p-4 bg-gradient-to-br  to-blue-50 min-h-screen">
+    <div className="container mx-auto p-4 bg-gradient-to-br  to-blue-50 min-h-screen">
       <Card className="w-full max-w-4xl mx-auto shadow-lg">
         <CardHeader className="pb-4">
           <div className="flex items-center space-x-4">
-            <Avatar className="h-20 w-20">
-            <AvatarImage src="/placeholder.svg" alt={user.username} />
-              <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+            <Avatar className="h-10 w-10 lg:h-20 lg:w-20">
+              <AvatarImage
+                src="/placeholder.svg"
+                alt={user.name || "Default"}
+              />
+              <AvatarFallback>
+                {user.name?.charAt(0).toUpperCase() || "D"}
+              </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-3xl font-bold text-green-800">{user.username}</CardTitle>
+              <CardTitle className="text-3xl font-bold text-green-800">
+                {user.name}
+              </CardTitle>
               <CardDescription className="text-lg text-green-600">
                 Perfil de Usuario EcoLife
               </CardDescription>
@@ -60,7 +71,9 @@ const UserProfile = () => {
             <TabsContent value="personal">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl font-semibold text-green-800">Información Personal</CardTitle>
+                  <CardTitle className="text-2xl font-semibold text-green-800">
+                    Información Personal
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-4">
@@ -71,7 +84,10 @@ const UserProfile = () => {
                         id="name"
                         value={user.name}
                         disabled={!editMode}
-                        onChange={(e) => setUser({...user, name: e.target.value})} />
+                        onChange={(e) =>
+                          setUser({ ...user, name: e.target.value })
+                        }
+                      />
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -82,7 +98,10 @@ const UserProfile = () => {
                         id="email"
                         value={user.email}
                         disabled={!editMode}
-                        onChange={(e) => setUser({...user, email: e.target.value})} />
+                        onChange={(e) =>
+                          setUser({ ...user, email: e.target.value })
+                        }
+                      />
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -93,28 +112,35 @@ const UserProfile = () => {
                         id="phone"
                         value={user.phone}
                         disabled={!editMode}
-                        onChange={(e) => setUser({...user, phone: e.target.value})} />
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <MapPin className="h-5 w-5 text-green-600" />
-                    <div className="flex-grow">
-                      <Label htmlFor="location">Ubicación</Label>
-                      <Input
-                        id="location"
-                        value={user.location}
-                        disabled={!editMode}
-                        onChange={(e) => setUser({...user, location: e.target.value})} />
+                        onChange={(e) =>
+                          setUser({ ...user, phone: e.target.value })
+                        }
+                      />
                     </div>
                   </div>
                   <div className="flex justify-end space-x-4 mt-6">
                     {editMode ? (
                       <>
-                        <Button onClick={() => setEditMode(false)} variant="outline">Cancelar</Button>
-                        <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">Guardar</Button>
+                        <Button
+                          onClick={() => setEditMode(false)}
+                          variant="outline"
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={handleSave}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          Guardar
+                        </Button>
                       </>
                     ) : (
-                      <Button onClick={handleEdit} className="bg-green-600 hover:bg-green-700">Editar Perfil</Button>
+                      <Button
+                        onClick={handleEdit}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        Editar Perfil
+                      </Button>
                     )}
                   </div>
                 </CardContent>
@@ -123,13 +149,17 @@ const UserProfile = () => {
             <TabsContent value="settings">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl font-semibold text-green-800">Configuración</CardTitle>
+                  <CardTitle className="text-2xl font-semibold text-green-800">
+                    Configuración
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label className="text-base">Notificaciones</Label>
-                      <p className="text-sm text-gray-500">Recibe actualizaciones sobre tus logros eco</p>
+                      <p className="text-sm text-gray-500">
+                        Recibe actualizaciones sobre tus logros eco
+                      </p>
                     </div>
                     <Switch />
                   </div>
@@ -139,11 +169,13 @@ const UserProfile = () => {
                       <Input
                         id="current-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Contraseña actual" />
+                        placeholder="Contraseña actual"
+                      />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        className="absolute inset-y-0 right-0 flex items-center pr-3"
+                      >
                         {showPassword ? (
                           <EyeOff className="h-5 w-5 text-gray-400" />
                         ) : (
@@ -157,7 +189,8 @@ const UserProfile = () => {
                     <Input
                       id="new-password"
                       type="password"
-                      placeholder="Ingresa tu nueva contraseña" />
+                      placeholder="Ingresa tu nueva contraseña"
+                    />
                   </div>
                   <Button className="w-full bg-green-600 hover:bg-green-700">
                     <Lock className="mr-2 h-4 w-4" /> Actualizar Contraseña
@@ -168,7 +201,7 @@ const UserProfile = () => {
           </Tabs>
         </CardContent>
       </Card>
-    </div>)
+    </div>
   );
 };
 
