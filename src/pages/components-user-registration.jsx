@@ -14,12 +14,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { postData } from "@/components/lib/api";
-import { Import, ImportIcon, Leaf } from "lucide-react";
+import { Leaf } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SuccessAlert, ErrorAlert } from "@/components/ui/alert-register";
 
 const UserRegistration = () => {
   const [formData, setFormData] = useState({
+    nombre: "",
+    apellido: "",
+    telefono: "",
     username: "",
     email: "",
     password: "",
@@ -37,9 +40,6 @@ const UserRegistration = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    setTimeout(() => {
-      navigate('/login');
-    }, 2000);
 
     if (formData.password !== formData.confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -51,10 +51,16 @@ const UserRegistration = () => {
         username: formData.username,
         email: formData.email,
         password: formData.password,
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        telefono: formData.telefono,
       });
 
       if (response.success) {
         setSuccess("Registro exitoso. Ahora puedes iniciar sesión.");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       } else {
         setError(response.message || "Error en el registro");
       }
@@ -66,7 +72,7 @@ const UserRegistration = () => {
 
   return (
     <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-4xl">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-green-800 flex items-center">
             <Leaf className="h-6 w-6 mr-2" />
@@ -78,63 +84,100 @@ const UserRegistration = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Nombre de usuario</Label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                required
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Elige un nombre de usuario"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Correo electrónico</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="tu@email.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Crea una contraseña segura"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirma tu contraseña"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nombre">Nombre</Label>
+                <Input
+                  id="nombre"
+                  name="nombre"
+                  type="text"
+                  required
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  placeholder="Tu nombre"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="apellido">Apellido</Label>
+                <Input
+                  id="apellido"
+                  name="apellido"
+                  type="text"
+                  required
+                  value={formData.apellido}
+                  onChange={handleChange}
+                  placeholder="Tu apellido"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefono">Teléfono</Label>
+                <Input
+                  id="telefono"
+                  name="telefono"
+                  type="tel"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  placeholder="Tu número de teléfono"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="username">Nombre de usuario</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Elige un nombre de usuario"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Correo electrónico</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="tu@email.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Crea una contraseña segura"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirma tu contraseña"
+                />
+              </div>
             </div>
             <Button
               type="submit"
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-green-600 hover:bg-green-700 mt-6"
             >
               Registrarse
             </Button>
           </form>
-          {success && <SuccessAlert message={success} className="font-bold" />}
-          {error && <ErrorAlert message={error} className="font-bold" />}
+          {success && <SuccessAlert message={success} className="font-bold mt-4" />}
+          {error && <ErrorAlert message={error} className="font-bold mt-4" />}
         </CardContent>
         <CardFooter>
           <p className="text-sm text-gray-600">
