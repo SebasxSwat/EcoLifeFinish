@@ -1,35 +1,60 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Leaf, TreeDeciduous, Recycle, Droplet, Award, TrendingUp, Calendar } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  Leaf,
+  TreeDeciduous,
+  Recycle,
+  Droplet,
+  Award,
+  TrendingUp,
+  Calendar,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { jwtDecode } from "jwt-decode";
 
 const UserDashboard = () => {
+  const dataUser = jwtDecode(localStorage.getItem("token"));
+
   const [userData, setUserData] = useState({
-    username: '',
-    eco_score: 0,
+    username: dataUser.username,
+    eco_score: dataUser.user_id,
     carbon_footprint: 0,
     treesPlanted: 0,
     wasteRecycled: 0,
     waterSaved: 0,
     activities: [],
-    badges: []
+    badges: [],
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('token'); 
-        const response = await fetch('http://localhost:8080/auth/user', {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:8080/auth/user", {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
-  
+
         if (response.ok) {
           const data = await response.json();
           setUserData({
@@ -40,7 +65,7 @@ const UserDashboard = () => {
             wasteRecycled: data.waste_recycled || 0,
             waterSaved: data.water_saved || 0,
             activities: data.activities || [],
-            badges: data.badges || []
+            badges: data.badges || [],
           });
         } else {
           console.error("Error al obtener los datos del usuario");
@@ -49,14 +74,14 @@ const UserDashboard = () => {
         console.error("Error al hacer la solicitud:", error);
       }
     };
-  
+
     fetchUserData();
   }, []);
 
   const getEcoScoreColor = (score) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
   };
 
   return (
@@ -67,15 +92,25 @@ const UserDashboard = () => {
             <div className="flex items-center space-x-4">
               <Avatar className="h-10 w-10 lg:h-20 lg:w-20">
                 <AvatarImage src="/placeholder.svg" alt={userData.username} />
-                <AvatarFallback>{userData.username.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarFallback>
+                  {userData.username.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div>
-                <CardTitle className="text-lg lg:text-3xl font-bold text-green-600">Bienvenido, {userData.username}</CardTitle>
+                <CardTitle className="text-lg lg:text-3xl font-bold text-green-600">
+                  Bienvenido/a, {userData.username}
+                </CardTitle>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs lg:text-sm font-medium text-gray-500">Eco-Score</p>
-              <p className={`text-lg lg:text-4xl font-bold ${getEcoScoreColor(userData.eco_score)}`}>
+              <p className="text-xs lg:text-sm font-medium text-gray-500">
+                Eco-Score
+              </p>
+              <p
+                className={`text-lg lg:text-4xl font-bold ${getEcoScoreColor(
+                  userData.eco_score
+                )}`}
+              >
                 {userData.eco_score}
               </p>
             </div>
@@ -87,20 +122,31 @@ const UserDashboard = () => {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-400">Huella de Carbono</p>
-                    <p className="text-2xl font-bold text-green-600">{userData.carbon_footprint} ton</p>
+                    <p className="text-sm font-medium text-gray-400">
+                      Huella de Carbono
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {userData.carbon_footprint} ton
+                    </p>
                   </div>
                   <Leaf className="h-10 w-10 text-green-500" />
                 </div>
-                <Progress value={(userData.carbon_footprint / 20) * 100} className="mt-4" />
+                <Progress
+                  value={(userData.carbon_footprint / 20) * 100}
+                  className="mt-4"
+                />
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-400">Árboles Plantados</p>
-                    <p className="text-2xl font-bold text-green-600">{userData.treesPlanted}</p>
+                    <p className="text-sm font-medium text-gray-400">
+                      Árboles Plantados
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {userData.treesPlanted}
+                    </p>
                   </div>
                   <TreeDeciduous className="h-10 w-10 text-green-500" />
                 </div>
@@ -110,8 +156,12 @@ const UserDashboard = () => {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-400">Residuos Reciclados</p>
-                    <p className="text-2xl font-bold text-green-600">{userData.wasteRecycled} kg</p>
+                    <p className="text-sm font-medium text-gray-400">
+                      Residuos Reciclados
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {userData.wasteRecycled} kg
+                    </p>
                   </div>
                   <Recycle className="h-10 w-10 text-green-500" />
                 </div>
@@ -121,8 +171,12 @@ const UserDashboard = () => {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-400">Agua Ahorrada</p>
-                    <p className="text-2xl font-bold text-green-600">{userData.waterSaved} L</p>
+                    <p className="text-sm font-medium text-gray-400">
+                      Agua Ahorrada
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {userData.waterSaved} L
+                    </p>
                   </div>
                   <Droplet className="h-10 w-10 text-blue-500" />
                 </div>
@@ -133,17 +187,24 @@ const UserDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle className="text-xl font-semibold text-green-800">Tu Progreso Eco</CardTitle>
+                <CardTitle className="text-xl font-semibold text-green-800">
+                  Tu Progreso Eco
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={userData.activities}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" tick={{ fontSize: 12 }}/>
-                      <YAxis tick={{ fontSize: 14 }}/>
+                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 14 }} />
                       <Tooltip />
-                      <Line type="monotone" dataKey="score" stroke="#10B981" strokeWidth={2} />
+                      <Line
+                        type="monotone"
+                        dataKey="score"
+                        stroke="#10B981"
+                        strokeWidth={2}
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -151,7 +212,9 @@ const UserDashboard = () => {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl font-semibold text-green-800">Tus Logros</CardTitle>
+                <CardTitle className="text-xl font-semibold text-green-800">
+                  Tus Logros
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

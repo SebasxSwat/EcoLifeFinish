@@ -3,7 +3,6 @@ import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
 
-// Deshabilitar el parsing automático de Next.js para manejar archivos
 export const config = {
   api: {
     bodyParser: false,
@@ -22,7 +21,6 @@ export default function handler(req, res) {
       return;
     }
 
-    // El archivo se guarda en public/uploads con su nombre original
     const oldPath = files.file[0].filepath;
     const newPath = path.join(process.cwd(), '/uploads/', files.file[0].originalFilename);
     

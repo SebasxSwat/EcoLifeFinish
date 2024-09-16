@@ -9,11 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { User, Mail, Phone, MapPin, Lock, Eye, EyeOff } from 'lucide-react';
+import { jwtDecode } from 'jwt-decode';
 
 const UserProfile = () => {
+  const dataUser = jwtDecode(localStorage.getItem("token"));
+
   const [user, setUser] = useState({
-    name: "Ana García",
-    email: "ana.garcia@example.com",
+    username: dataUser.username,
+    email: dataUser.email,
     phone: "+34 123 456 789",
     location: "Madrid, España",
     avatar: "https://i.pravatar.cc/150?img=5",
@@ -27,7 +30,6 @@ const UserProfile = () => {
   };
 
   const handleSave = () => {
-    // Here you would typically send the updated user data to your backend
     setEditMode(false);
   };
 
@@ -38,11 +40,11 @@ const UserProfile = () => {
         <CardHeader className="pb-4">
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+            <AvatarImage src="/placeholder.svg" alt={user.username} />
+              <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-3xl font-bold text-green-800">{user.name}</CardTitle>
+              <CardTitle className="text-3xl font-bold text-green-800">{user.username}</CardTitle>
               <CardDescription className="text-lg text-green-600">
                 Perfil de Usuario EcoLife
               </CardDescription>
