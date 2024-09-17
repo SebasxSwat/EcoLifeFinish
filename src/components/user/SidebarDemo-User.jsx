@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import {
   IconArrowLeft,
@@ -19,6 +20,8 @@ export function SidebarDemoUser() {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [isMobile, setIsMobile] = useState(false);
 
+  const navigate = useNavigate(); 
+
   useEffect(() => {
     document.documentElement.classList.add("dark");
   }, []);
@@ -28,7 +31,7 @@ export function SidebarDemoUser() {
       setIsMobile(window.innerWidth <= 768); 
     };
 
-    handleResize(); // Check on mount
+    handleResize(); 
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -39,8 +42,15 @@ export function SidebarDemoUser() {
   const handleOptionClick = (id) => {
     setCurrentPage(id);
     if (isMobile) {
-      setOpen(false); // Close sidebar on mobile when an option is selected
+      setOpen(false); 
     }
+  };
+
+  const handleLogout = () => {
+
+    localStorage.removeItem("token");
+    
+    navigate("/login");
   };
 
   const links = [
@@ -78,6 +88,7 @@ export function SidebarDemoUser() {
       icon: (
         <IconArrowLeft className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
+      onClick: handleLogout 
     },
   ];
 
@@ -88,8 +99,7 @@ export function SidebarDemoUser() {
       case "desafio":
         return <UserChallenges />;
       case "noticias":
-        return <NoticiasEcologicas/>;
-      case "home":
+        return <NoticiasEcologicas />;
       default:
         return <UserDashboard />;
     }
@@ -106,7 +116,13 @@ export function SidebarDemoUser() {
                 <SidebarLink
                   key={idx}
                   link={link}
-                  onClick={() => handleOptionClick(link.id)}
+                  onClick={() => {
+                    if (link.id === "logout") {
+                      handleLogout(); 
+                    } else {
+                      handleOptionClick(link.id);
+                    }
+                  }}
                 />
               ))}
             </div>

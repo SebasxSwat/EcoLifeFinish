@@ -22,7 +22,7 @@ const UserRegistration = () => {
   const [formData, setFormData] = useState({
     name: "",
     lastname: "",
-    phone: "",
+    phone: "", 
     username: "",
     email: "",
     password: "",
@@ -180,7 +180,7 @@ const UserRegistration = () => {
               </Button>
             </div>
           </form>
-          {success && <SuccessAlert message={success} className="font-bold mt-4" />}
+          {success && <SuccessAlert message={success} className="font-bold mt-4 text-green-500" />}
           {error && <ErrorAlert message={error} className="font-bold mt-4" />}
         </CardContent>
         <CardFooter className="justify-center">

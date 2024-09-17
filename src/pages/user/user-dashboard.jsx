@@ -16,7 +16,7 @@ import {
   Recycle,
   Droplet,
   Award,
-  } from "lucide-react";
+} from "lucide-react";
 import {
   LineChart,
   Line,
@@ -32,6 +32,7 @@ const UserDashboard = () => {
   const dataUser = jwtDecode(localStorage.getItem("token"));
 
   const [userData, setUserData] = useState({
+    id: dataUser.id,
     name: dataUser.name,
     username: dataUser.username,
     eco_score: dataUser.eco_score,
@@ -43,11 +44,12 @@ const UserDashboard = () => {
     badges: [],
   });
 
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8080/auth/login", {
+        const response = await fetch(`http://127.0.0.1:8080/user/${dataUser.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -55,16 +57,17 @@ const UserDashboard = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setUserData({
-            username: data.username,
-            eco_score: data.eco_score,
-            carbon_footprint: data.carbon_footprint,
+          setUserData((prevUserData) => ({
+            ...prevUserData,
+            name: data.name, 
+            eco_score: data.eco_score || prevUserData.eco_score,
+            carbon_footprint: data.carbon_footprint || 0,
             treesPlanted: data.trees_planted || 0,
             wasteRecycled: data.waste_recycled || 0,
             waterSaved: data.water_saved || 0,
             activities: data.activities || [],
             badges: data.badges || [],
-          });
+          }));
         } else {
           console.error("Error al obtener los datos del usuario");
         }
@@ -72,7 +75,6 @@ const UserDashboard = () => {
         console.error("Error al hacer la solicitud:", error);
       }
     };
-
     fetchUserData();
   }, []);
 
