@@ -22,6 +22,7 @@ const UserProfile = () => {
 
   const [user, setUser] = useState({
     name: dataUser.name,
+    lastname: dataUser.lastname,
     username: dataUser.username,
     email: dataUser.email,
     phone: dataUser.phone,
@@ -53,10 +54,10 @@ const UserProfile = () => {
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-3xl font-bold text-green-800">
-                {user.name}
+              <CardTitle className="text-3xl font-bold text-green-600">
+                {user.name} {user.lastname}
               </CardTitle>
-              <CardDescription className="text-lg text-green-600">
+              <CardDescription className="text-lg text-green-800">
                 Perfil de Usuario EcoLife
               </CardDescription>
             </div>
@@ -79,13 +80,27 @@ const UserProfile = () => {
                   <div className="flex items-center space-x-4">
                     <User className="h-5 w-5 text-green-600" />
                     <div className="flex-grow">
-                      <Label htmlFor="name">Nombre Completo</Label>
+                      <Label htmlFor="name">Nombre</Label>
                       <Input
                         id="name"
                         value={user.name}
                         disabled={!editMode}
                         onChange={(e) =>
                           setUser({ ...user, name: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <User className="h-5 w-5 text-green-600" />
+                    <div className="flex-grow">
+                      <Label htmlFor="name">Apellido</Label>
+                      <Input
+                        id="lastname"
+                        value={user.lastname}
+                        disabled={!editMode}
+                        onChange={(e) =>
+                          setUser({ ...user, lastname: e.target.value })
                         }
                       />
                     </div>
