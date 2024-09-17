@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { fetchData } from "@/components/lib/api";
-import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "@/pages/components-login";
 import LandingPage from "@/pages/landing/app-page";
 import UserRegistration from "@/pages/components-user-registration";

@@ -11,7 +11,7 @@ export const SuccessAlert = ({ message }) => {
 
 export const ErrorAlert = ({ message }) => {
   return (
-    <Alert variant="default" className="mt-4">
+    <Alert variant="default" className="mt-4 text-grenn-600">
       <div>{message}</div>
     </Alert>
   );

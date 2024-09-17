@@ -1,47 +1,89 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { User, Mail, Phone, MapPin, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
 const UserProfile = () => {
-  const dataUser = jwtDecode(localStorage.getItem("token"));
-
   const [user, setUser] = useState({
-    name: dataUser.name,
-    lastname: dataUser.lastname,
-    username: dataUser.username,
-    email: dataUser.email,
-    phone: dataUser.phone,
+    id: null,
+    name: '',
+    lastname: '',
+    username: '',
+    email: '',
+    phone: '',
   });
 
   const [editMode, setEditMode] = useState(false);
-
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Token no encontrado");
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.id;
+
+        const response = await fetch(`http://127.0.0.1:8080/user/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos del usuario");
+        }
+
+        const userData = await response.json();
+        setUser(userData);
+
+      } catch (error) {
+        console.error("Error al cargar los datos del usuario:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleEdit = () => {
     setEditMode(!editMode);
   };
 
-  const handleSave = () => {
-    setEditMode(false);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://127.0.0.1:8080/user/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar los datos');
+      }
+
+      setEditMode(false);
+    } catch (error) {
+      console.error('Error al guardar los cambios:', error);
+    }
   };
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-br  to-blue-50 min-h-screen">
+    <div className="container mx-auto p-4 bg-gradient-to-br to-blue-50 min-h-screen">
       <Card className="w-full max-w-4xl mx-auto shadow-lg">
         <CardHeader className="pb-4">
           <div className="flex items-center space-x-4">
@@ -73,7 +115,7 @@ const UserProfile = () => {
             <TabsContent value="personal">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl font-semibold text-green-800">
+                  <CardTitle className="text-2xl font-semibold text-green-600">
                     Información Personal
                   </CardTitle>
                 </CardHeader>
@@ -95,7 +137,7 @@ const UserProfile = () => {
                   <div className="flex items-center space-x-4">
                     <User className="h-5 w-5 text-green-600" />
                     <div className="flex-grow">
-                      <Label htmlFor="name">Apellido</Label>
+                      <Label htmlFor="lastname">Apellido</Label>
                       <Input
                         id="lastname"
                         value={user.lastname}
