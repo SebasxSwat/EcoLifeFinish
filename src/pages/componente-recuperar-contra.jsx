@@ -17,46 +17,34 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Leaf, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const Login = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
+const RecuperarContrasena = () => {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate(); 
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setMessage("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8080/auth/login", {
+      const response = await fetch("http://127.0.0.1:8080/auth/request-password-reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ email }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
-        setError(data.message || "Login failed");
+        setError(data.message || "Ocurrió un error al solicitar la recuperación de contraseña");
         return;
       }
 
-      const data = await response.json();
-      localStorage.setItem("token", data.access_token);
-
-      if (data.is_first_login) {
-        navigate('/cuestionario');
-      } else {
-        navigate('/dashboardUser');
-      }
-
+      setMessage(data.message || "Se ha enviado un enlace de recuperación a tu correo electrónico");
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError("Ocurrió un error. Por favor, intenta de nuevo.");
     }
   };
 
@@ -66,36 +54,24 @@ const Login = () => {
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-green-800 flex items-center">
             <Leaf className="h-6 w-6 mr-2" />
-            Inicio de Sesión EcoLife
+            Recuperar Contraseña EcoLife
           </CardTitle>
           <CardDescription>
-            Ingrese sus credenciales para acceder a su cuenta
+            Ingresa tu correo electrónico para recuperar tu contraseña
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Nombre de Usuario</Label>
+              <Label htmlFor="email">Correo Electrónico</Label>
               <Input
-                id="username"
-                name="username"
-                type="text"
+                id="email"
+                name="email"
+                type="email"
                 required
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Ingresa tu nombre de usuario"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Ingresa tu contraseña"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Ingresa tu correo electrónico"
               />
             </div>
             {error && (
@@ -105,25 +81,26 @@ const Login = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+            {message && (
+              <Alert variant="success" className="bg-green-100 border-green-400 text-green-700">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Éxito</AlertTitle>
+                <AlertDescription>{message}</AlertDescription>
+              </Alert>
+            )}
             <Button
               type="submit"
               className="w-full bg-green-600 hover:bg-green-700"
             >
-              Login
+              Recuperar Contraseña
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
+        <CardFooter>
           <p className="text-sm text-gray-600">
-            ¿No tienes una cuenta?{" "}
-            <Link to="/register" className="text-green-600 hover:underline">
-              Regístrate aquí
-            </Link>
-          </p>
-          <p className="text-sm text-gray-600">
-            ¿Olvidaste tu contraseña?{" "}
-            <Link to="/recuperar" className="text-green-600 hover:underline">
-              Recupérala aquí
+            ¿Recordaste tu contraseña?{" "}
+            <Link to="/login" className="text-green-600 hover:underline">
+              Volver al inicio de sesión
             </Link>
           </p>
         </CardFooter>
@@ -132,4 +109,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default RecuperarContrasena;

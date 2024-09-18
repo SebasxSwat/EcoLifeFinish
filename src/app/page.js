@@ -8,7 +8,9 @@ import LandingPage from "@/pages/landing/app-page";
 import UserRegistration from "@/pages/components-user-registration";
 import Loading from "@/components/ui/loading";
 import { SidebarDemoUser } from "@/components/user/SidebarDemo-User";
-import { CuestionarioHuellaCarbono } from "@/pages/user/cuestionario";
+import RecuperarContrasena from "@/pages/componente-recuperar-contra";
+import RestablecerContrasena from "@/pages/componente-restablecer-contra";
+import { CuestionarioHuellaCarbono } from "user/cuestionario";
 
 function Page() {
   const [data, setData] = useState(null);
@@ -38,6 +40,8 @@ function Page() {
           <Route path="/register" element={<UserRegistration/>}/>
           <Route path="/dashboardUser" element={<SidebarDemoUser/>}/>
           <Route path="/cuestionario" element={<CuestionarioHuellaCarbono/>}/>
+          <Route path="/restablecer" element={<RestablecerContrasena/>}/>
+          <Route path="/recuperar" element={<RecuperarContrasena/>}/>
         </Routes>
       </Router>
     </div>

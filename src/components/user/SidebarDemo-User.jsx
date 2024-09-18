@@ -10,10 +10,10 @@ import {
 } from "@tabler/icons-react";
 import { DarkMode } from "../ui/darkMode";
 import { motion } from "framer-motion";
-import UserDashboard from "@/pages/user/user-dashboard";
-import UserProfile from "@/pages/user/user-profile";
-import UserChallenges from "@/pages/user/user-challenges";
-import { NoticiasEcologicas } from "@/pages/user/noticias-ecologicas";
+import UserDashboard from "user/user-dashboard";
+import UserProfile from "user/user-profile";
+import UserChallenges from "user/user-challenges";
+import { NoticiasEcologicas } from "user/noticias-ecologicas";
 
 export function SidebarDemoUser() {
   const [open, setOpen] = useState(false);
