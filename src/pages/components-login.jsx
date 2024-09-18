@@ -49,7 +49,7 @@ const Login = () => {
       const data = await response.json();
       localStorage.setItem("token", data.access_token);
 
-      if (data.is_first_login) {
+      if (data.first_login) {
         navigate('/cuestionario');
       } else {
         navigate('/dashboardUser');

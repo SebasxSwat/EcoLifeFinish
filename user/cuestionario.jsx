@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider"
 import { Progress } from "@/components/ui/progress"
 import { useRouter } from 'next/navigation'
 import { Leaf, Car, Bike, Train, Utensils, Recycle, Droplet, Lightbulb } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export function CuestionarioHuellaCarbono({ userId }) {
   const router = useRouter()
@@ -86,7 +87,6 @@ export function CuestionarioHuellaCarbono({ userId }) {
   }
 
   const handleSubmit = async () => {
-    // Cálculo más detallado de la huella de carbono
     let huellaCarbono = 0
     huellaCarbono += respuestas.consumoElectrico * 0.5
     huellaCarbono += respuestas.tipoTransporte * 0.7
@@ -162,6 +162,7 @@ export function CuestionarioHuellaCarbono({ userId }) {
             </div>
           </motion.div>
           <Button 
+            Link to="/dashboardUser"
             onClick={handleNext} 
             className="w-full mt-6 bg-green-600 hover:bg-green-700"
           >
