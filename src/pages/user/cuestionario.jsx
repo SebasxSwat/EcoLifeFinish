@@ -23,7 +23,7 @@ export function CuestionarioHuellaCarbono() {
     consumoAgua: 50,
     comprasOnline: 50,
   })
-  const [userId, setUserId] = useState(nul)
+  const [userId, setUserId] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -117,13 +117,27 @@ export function CuestionarioHuellaCarbono() {
       return
     }
 
-    let huellaCarbono = 0
-    huellaCarbono += respuestas.consumoElectrico * 0.5
-    huellaCarbono += respuestas.tipoTransporte * 0.7
-    huellaCarbono += respuestas.consumoCarne * 0.8
-    huellaCarbono -= (100 - respuestas.reciclaje) * 0.3
-    huellaCarbono += respuestas.consumoAgua * 0.4
-    huellaCarbono += respuestas.comprasOnline * 0.2
+    let huellaCarbono = 0;
+
+    const consumoElectrico = (respuestas.consumoElectrico / 100) * 3000 * 0.0005;
+    huellaCarbono += consumoElectrico;
+
+    const tipoTransporte = respuestas.tipoTransporte;
+    let impactoTransporte = (tipoTransporte / 100) * 2;
+    huellaCarbono += impactoTransporte;
+
+    const consumoCarne = (respuestas.consumoCarne / 100) * 3;
+    huellaCarbono += consumoCarne;
+
+    const impactoReciclaje = 1 * (1 - (respuestas.reciclaje / 100));
+    huellaCarbono += impactoReciclaje;
+
+    const consumoAgua = (respuestas.consumoAgua / 100) * 3;
+    huellaCarbono += consumoAgua;
+
+    const comprasOnline = (respuestas.comprasOnline / 100) * 0.7;
+    huellaCarbono += comprasOnline;
+
   
     if (isNaN(huellaCarbono) || huellaCarbono < 0) {
       setError('El valor calculado de la huella de carbono no es válido')
@@ -135,7 +149,7 @@ export function CuestionarioHuellaCarbono() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Añadimos el token a la petición
+          'Authorization': `Bearer ${localStorage.getItem('token')}` 
         },
         body: JSON.stringify({
           user_id: userId,

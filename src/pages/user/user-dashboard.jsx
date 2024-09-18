@@ -1,0 +1,261 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Leaf, TreeDeciduous, Recycle, Droplet, Award } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+import { jwtDecode } from "jwt-decode";
+
+const AVERAGE_CARBON_FOOTPRINT = 4.75;
+
+const UserDashboard = () => {
+  const [userData, setUserData] = useState({
+    id: "",
+    name: "",
+    username: "",
+    eco_score: "",
+    carbon_footprint: "",
+    treesPlanted: 0,
+    wasteRecycled: 0,
+    waterSaved: 0,
+    activities: [],
+    badges: [],
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+
+      if (token && typeof token === "string") {
+        try {
+          const dataUser = jwtDecode(token);
+          const userId = dataUser.id;
+
+          const carbonFootprintResponse = await fetch(
+            `http://127.0.0.1:8080/carbon-footprint/get/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (carbonFootprintResponse.ok) {
+            const carbonFootprintData = await carbonFootprintResponse.json();
+
+            setUserData((prevUserData) => ({
+              ...prevUserData,
+              carbon_footprint: carbonFootprintData.value || 0,
+            }));
+          } else {
+            console.error("Error al obtener la huella de carbono.");
+          }
+
+          const userResponse = await fetch(
+            `http://127.0.0.1:8080/user/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            setUserData((prevUserData) => ({
+              ...prevUserData,
+              id: userId,
+              name: userData.name,
+              username: userData.username || prevUserData.username,
+              eco_score: userData.eco_score || prevUserData.eco_score,
+              treesPlanted: userData.trees_planted || 0,
+              wasteRecycled: userData.waste_recycled || 0,
+              waterSaved: userData.water_saved || 0,
+              activities: userData.activities || [],
+              badges: userData.badges || [],
+            }));
+          } else {
+            console.error("Error al obtener los datos del usuario.");
+          }
+        } catch (error) {
+          console.error(
+            "Error al decodificar el token o hacer la solicitud:",
+            error
+          );
+        }
+      } else {
+        console.error("Token no disponible o no es una cadena.");
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const getEcoScoreColor = (score) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const carbonFootprintColor = userData.carbon_footprint > AVERAGE_CARBON_FOOTPRINT
+    ? "text-red-600"
+    : "text-green-600";
+
+  return (
+    <div className="container mx-auto p-4 bg-gradient-to-br  to-blue-50 min-h-screen">
+      <Card className="w-full max-w-6xl mx-auto shadow-lg">
+        <CardHeader className="pb-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
+                <AvatarImage src="/placeholder.svg" alt={userData.name} />
+                <AvatarFallback className="text-2xl">
+                  {userData.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle className="text-2xl sm:text-3xl font-bold p-4 text-green-600 dark:text-green-600">
+                  Bienvenid@, {userData.name}
+                </CardTitle>
+              </div>
+            </div>
+            <div className="text-center sm:text-right mt-4 p-4 sm:mt-0">
+              <p className="text-sm sm:text-lg font-medium text-gray-500 dark:text-gray-400">
+                Eco-Score
+              </p>
+              <p
+                className={`text-3xl sm:text-4xl font-bold ${getEcoScoreColor(
+                  userData.eco_score
+                )}`}
+              >
+                {userData.eco_score}
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between space-x-4">
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-gray-300">
+                      Huella de Carbono
+                    </p>
+                    <p className={`text-2xl font-bold ${carbonFootprintColor}`}>
+                      {userData.carbon_footprint} ton
+                    </p>
+                  </div>
+                  <Leaf className="h-10 w-10 text-green-500 flex-shrink-0" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+               <div className="flex items-center justify-between ">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      Árboles Plantados
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {userData.treesPlanted}
+                    </p>
+                  </div>
+                  <TreeDeciduous className="h-10 w-10 text-green-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      Residuos Reciclados
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {userData.wasteRecycled} kg
+                    </p>
+                  </div>
+                  <Recycle className="h-10 w-10 text-green-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      Agua Ahorrada
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {userData.waterSaved} L
+                    </p>
+                  </div>
+                  <Droplet className="h-10 w-10 text-blue-500" />
+                </div>
+              </CardContent>
+            </Card> 
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3  gap-6 mb-6">
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-green-800">
+                  Tu Progreso Eco
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={userData.activities}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="score"
+                        stroke="#10B981"
+                        strokeWidth={2}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-green-800">
+                  Tus Logros
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {userData.badges.map((badge, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Award className="h-6 w-6 text-yellow-500" />
+                      <span className="text-gray-700">{badge}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default UserDashboard;

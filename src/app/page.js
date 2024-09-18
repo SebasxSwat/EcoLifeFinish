@@ -9,7 +9,7 @@ import UserRegistration from "@/pages/components-user-registration";
 import Loading from "@/components/ui/loading";
 import RecuperarContrasena from "@/pages/componente-recuperar-contra";
 import RestablecerContrasena from "@/pages/componente-restablecer-contra";
-import { CuestionarioHuellaCarbono } from "user/cuestionario";
+import { CuestionarioHuellaCarbono } from "@/pages/user/cuestionario";
 import { SidebarDemoUser } from "@/components/user/SidebarDemo-User";
 
 function Page() {

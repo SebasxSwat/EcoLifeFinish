@@ -108,7 +108,7 @@ const UserProfile = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="personal" className="w-full">
-            <TabsList className="grid w-full h-12 grid-cols-2 mb-8">
+            <TabsList className="flex w-full h-12 grid-cols-2 mb-8">
               <TabsTrigger value="personal">Información Personal</TabsTrigger>
               <TabsTrigger value="settings">Configuración</TabsTrigger>
             </TabsList>
