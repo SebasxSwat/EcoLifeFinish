@@ -1,18 +1,19 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { jwtDecode } from 'jwt-decode'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Progress } from "@/components/ui/progress"
-import { useRouter } from 'next/navigation'
+import { useNavigate } from 'react-router-dom'
 import { Leaf, Car, Bike, Train, Utensils, Recycle, Droplet, Lightbulb } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 
-export function CuestionarioHuellaCarbono({ userId }) {
-  const router = useRouter()
+export function CuestionarioHuellaCarbono() {
+  const navigate = useNavigate()
+
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [respuestas, setRespuestas] = useState({
     consumoElectrico: 50,
@@ -22,6 +23,30 @@ export function CuestionarioHuellaCarbono({ userId }) {
     consumoAgua: 50,
     comprasOnline: 50,
   })
+  const [userId, setUserId] = useState(nul)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token)
+        if (decodedToken.id) {
+          setUserId(decodedToken.id)
+        } else {
+          setError('El token no contiene un ID de usuario válido')
+        }
+      } catch (error) {
+        console.error('Error al decodificar el token:', error)
+        setError('Error al decodificar el token de usuario')
+      }
+    } else {
+      setError('No se encontró un token de usuario')
+    }
+    setIsLoading(false)
+  }, [])
 
   const questions = [
     {
@@ -29,7 +54,7 @@ export function CuestionarioHuellaCarbono({ userId }) {
       description: "¿Cómo describirías tu consumo eléctrico en casa?",
       icon: <Lightbulb className="w-8 h-8 text-yellow-400" />,
       field: "consumoElectrico",
-      min: "Bajo", 
+      min: "Bajo",
       max: "Alto"
     },
     {
@@ -87,6 +112,11 @@ export function CuestionarioHuellaCarbono({ userId }) {
   }
 
   const handleSubmit = async () => {
+    if (!userId) {
+      setError('No se pudo obtener el ID del usuario. Por favor, inicia sesión nuevamente.')
+      return
+    }
+
     let huellaCarbono = 0
     huellaCarbono += respuestas.consumoElectrico * 0.5
     huellaCarbono += respuestas.tipoTransporte * 0.7
@@ -94,27 +124,48 @@ export function CuestionarioHuellaCarbono({ userId }) {
     huellaCarbono -= (100 - respuestas.reciclaje) * 0.3
     huellaCarbono += respuestas.consumoAgua * 0.4
     huellaCarbono += respuestas.comprasOnline * 0.2
-
+  
+    if (isNaN(huellaCarbono) || huellaCarbono < 0) {
+      setError('El valor calculado de la huella de carbono no es válido')
+      return
+    }
+  
     try {
-      const response = await fetch('/api/guardar-huella-carbono', {
+      const response = await fetch('http://127.0.0.1:8080/carbon-footprint/save', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Añadimos el token a la petición
         },
         body: JSON.stringify({
-          userId,
-          huellaCarbono,
+          user_id: userId,
+          value: huellaCarbono,
         }),
       })
-
+  
       if (response.ok) {
-        router.push('/dashboard')
+        navigate('/dashboardUser')
       } else {
-        throw new Error('Error al guardar la huella de carbono')
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al guardar la huella de carbono')
       }
     } catch (error) {
       console.error('Error:', error)
+      setError(`Error al guardar la huella de carbono: ${error.message}`)
     }
+  }
+
+  if (isLoading) {
+    return <div>Cargando...</div>
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    )
   }
 
   return (
@@ -162,7 +213,6 @@ export function CuestionarioHuellaCarbono({ userId }) {
             </div>
           </motion.div>
           <Button 
-            Link to="/dashboardUser"
             onClick={handleNext} 
             className="w-full mt-6 bg-green-600 hover:bg-green-700"
           >
