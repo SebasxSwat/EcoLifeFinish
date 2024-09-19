@@ -24,8 +24,8 @@ const UserDashboard = () => {
     id: "",
     name: "",
     username: "",
-    eco_score: "",
-    carbon_footprint: "",
+    eco_score: 0,
+    carbon_footprint: 0,
     treesPlanted: 0,
     wasteRecycled: 0,
     waterSaved: 0,
@@ -103,8 +103,8 @@ const UserDashboard = () => {
   }, []);
 
   const getEcoScoreColor = (score) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-yellow-600";
+    if (score >= 450) return "text-green-600";
+    if (score >= 280) return "text-yellow-600";
     return "text-red-600";
   };
 

@@ -1,18 +1,20 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Progress } from "@/components/ui/progress"
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Leaf, Car, Bike, Train, Utensils, Recycle, Droplet, Lightbulb } from 'lucide-react'
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 export function CuestionarioHuellaCarbono() {
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [respuestas, setRespuestas] = useState({
@@ -26,6 +28,7 @@ export function CuestionarioHuellaCarbono() {
   const [userId, setUserId] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showExitDialog, setShowExitDialog] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -46,6 +49,45 @@ export function CuestionarioHuellaCarbono() {
       setError('No se encontró un token de usuario')
     }
     setIsLoading(false)
+  }, [])
+
+  const shouldBlockNavigation = useCallback(
+    () => currentQuestion < questions.length - 1,
+    [currentQuestion]
+  )
+
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (shouldBlockNavigation()) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+
+    const handlePopState = (e) => {
+      if (shouldBlockNavigation()) {
+        setShowExitDialog(true)
+        e.preventDefault()
+        window.history.pushState(null, '', location.pathname)
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('popstate', handlePopState)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [shouldBlockNavigation, location.pathname])
+
+  const handleConfirmNavigation = useCallback(() => {
+    setShowExitDialog(false)
+    navigate('/')
+  }, [navigate])
+
+  const handleCancelNavigation = useCallback(() => {
+    setShowExitDialog(false)
   }, [])
 
   const questions = [
@@ -123,7 +165,7 @@ export function CuestionarioHuellaCarbono() {
     huellaCarbono += consumoElectrico;
 
     const tipoTransporte = respuestas.tipoTransporte;
-    let impactoTransporte = (tipoTransporte / 100) * 2;
+    let impactoTransporte = (tipoTransporte / 100) * 2.5;
     huellaCarbono += impactoTransporte;
 
     const consumoCarne = (respuestas.consumoCarne / 100) * 3;
@@ -138,7 +180,6 @@ export function CuestionarioHuellaCarbono() {
     const comprasOnline = (respuestas.comprasOnline / 100) * 0.7;
     huellaCarbono += comprasOnline;
 
-  
     if (isNaN(huellaCarbono) || huellaCarbono < 0) {
       setError('El valor calculado de la huella de carbono no es válido')
       return
@@ -183,57 +224,78 @@ export function CuestionarioHuellaCarbono() {
   }
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-green-800 flex items-center gap-2">
-            <Leaf className="w-6 h-6" />
-            Calcula tu Huella de Carbono
-          </CardTitle>
-          <CardDescription>Responde a estas preguntas para calcular tu impacto ambiental.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <motion.div
-            key={currentQuestion}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold text-green-700 flex items-center gap-2">
-                  {questions[currentQuestion].icon}
-                  {questions[currentQuestion].title}
-                </h3>
-                <span className="text-sm text-gray-500">
-                  {currentQuestion + 1} / {questions.length}
-                </span>
+    <>
+      <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-green-800 flex items-center gap-2">
+              <Leaf className="w-6 h-6" />
+              Calcula tu Huella de Carbono
+            </CardTitle>
+            <CardDescription>Responde a estas preguntas para calcular tu impacto ambiental.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <motion.div
+              key={currentQuestion}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold text-green-700 flex items-center gap-2">
+                    {questions[currentQuestion].icon}
+                    {questions[currentQuestion].title}
+                  </h3>
+                  <span className="text-sm text-gray-500">
+                    {currentQuestion + 1} / {questions.length}
+                  </span>
+                </div>
+                <Progress value={(currentQuestion + 1) / questions.length * 100} className="h-2" />
               </div>
-              <Progress value={(currentQuestion + 1) / questions.length * 100} className="h-2" />
-            </div>
-            <p className="text-gray-600 mb-4">{questions[currentQuestion].description}</p>
-            <div className="space-y-4">
-              <Slider
-                value={[respuestas[questions[currentQuestion].field]]}
-                onValueChange={(value) => handleSliderChange(value, questions[currentQuestion].field)}
-                max={100}
-                step={1}
-              />
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>{questions[currentQuestion].min}</span>
-                <span>{questions[currentQuestion].max}</span>
+              <p className="text-gray-600 mb-4">{questions[currentQuestion].description}</p>
+              <div className="space-y-4">
+                <Slider
+                  value={[respuestas[questions[currentQuestion].field]]}
+                  onValueChange={(value) => handleSliderChange(value, questions[currentQuestion].field)}
+                  max={100}
+                  step={1}
+                />
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>{questions[currentQuestion].min}</span>
+                  <span>{questions[currentQuestion].max}</span>
+                </div>
               </div>
-            </div>
-          </motion.div>
-          <Button 
-            onClick={handleNext} 
-            className="w-full mt-6 bg-green-600 hover:bg-green-700"
-          >
-            {currentQuestion < questions.length - 1 ? "Siguiente" : "Calcular y Guardar"}
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+            </motion.div>
+            <Button 
+              onClick={handleNext} 
+              className="w-full mt-6 bg-green-600 hover:bg-green-700"
+            >
+              {currentQuestion < questions.length - 1 ? "Siguiente" : "Calcular y Guardar"}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>¿Estás seguro que deseas salir?</DialogTitle>
+            <DialogDescription>
+              Si sales ahora, perderás todo el progreso en el cuestionario. ¿Estás seguro de que quieres continuar?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelNavigation}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmNavigation}>
+              Salir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
