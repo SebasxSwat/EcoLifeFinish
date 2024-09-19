@@ -165,7 +165,7 @@ export function CuestionarioHuellaCarbono() {
     huellaCarbono += consumoElectrico;
 
     const tipoTransporte = respuestas.tipoTransporte;
-    let impactoTransporte = (tipoTransporte / 100) * 2.5;
+    let impactoTransporte = (tipoTransporte / 100) * 3;
     huellaCarbono += impactoTransporte;
 
     const consumoCarne = (respuestas.consumoCarne / 100) * 3;
@@ -174,10 +174,10 @@ export function CuestionarioHuellaCarbono() {
     const impactoReciclaje = 1 * (1 - (respuestas.reciclaje / 100));
     huellaCarbono += impactoReciclaje;
 
-    const consumoAgua = (respuestas.consumoAgua / 100) * 3;
+    const consumoAgua = (respuestas.consumoAgua / 100) * 3.5;
     huellaCarbono += consumoAgua;
 
-    const comprasOnline = (respuestas.comprasOnline / 100) * 0.7;
+    const comprasOnline = (respuestas.comprasOnline / 100) * 3;
     huellaCarbono += comprasOnline;
 
     if (isNaN(huellaCarbono) || huellaCarbono < 0) {
