@@ -14,19 +14,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Leaf, AlertCircle } from "lucide-react";
+import { Leaf, AlertCircle, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const RecuperarContrasena = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
+    setIsLoading(true);
 
     try {
       const response = await fetch("http://127.0.0.1:8080/auth/request-password-reset", {
@@ -38,13 +40,14 @@ const RecuperarContrasena = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Ocurrió un error al solicitar la recuperación de contraseña");
-        return;
+        throw new Error(data.message || "Ocurrió un error al solicitar la recuperación de contraseña");
       }
 
       setMessage(data.message || "Se ha enviado un enlace de recuperación a tu correo electrónico");
     } catch (err) {
-      setError("Ocurrió un error. Por favor, intenta de nuevo.");
+      setError(err.message || "Ocurrió un error. Por favor, intenta de nuevo.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -53,7 +56,7 @@ const RecuperarContrasena = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-green-800 flex items-center">
-            <Leaf className="h-6 w-6 mr-2" />
+            <Leaf className="h-6 w-6 mr-2" aria-hidden="true" />
             Recuperar Contraseña EcoLife
           </CardTitle>
           <CardDescription>
@@ -72,18 +75,22 @@ const RecuperarContrasena = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Ingresa tu correo electrónico"
+                aria-describedby="email-description"
               />
+              <p id="email-description" className="sr-only">
+                Ingresa el correo electrónico asociado a tu cuenta para recibir instrucciones de recuperación de contraseña
+              </p>
             </div>
             {error && (
               <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
+                <AlertCircle className="h-4 w-4" aria-hidden="true" />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {message && (
               <Alert variant="success" className="bg-green-100 border-green-400 text-green-700">
-                <AlertCircle className="h-4 w-4" />
+                <AlertCircle className="h-4 w-4" aria-hidden="true" />
                 <AlertTitle>Éxito</AlertTitle>
                 <AlertDescription>{message}</AlertDescription>
               </Alert>
@@ -91,8 +98,16 @@ const RecuperarContrasena = () => {
             <Button
               type="submit"
               className="w-full bg-green-600 hover:bg-green-700"
+              disabled={isLoading}
             >
-              Recuperar Contraseña
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                "Recuperar Contraseña"
+              )}
             </Button>
           </form>
         </CardContent>

@@ -40,8 +40,8 @@ function Page() {
           <Route path="/register" element={<UserRegistration/>}/>
           <Route path="/dashboardUser" element={<SidebarDemoUser/>}/>
           <Route path="/cuestionario" element={<CuestionarioHuellaCarbono/>}/>
-          <Route path="/restablecer" element={<RestablecerContrasena/>}/>
-          <Route path="/recuperar" element={<RecuperarContrasena/>}/>
+          <Route path="/restablecer-contasena" element={<RestablecerContrasena/>}/>
+          <Route path="/recuperar-contrasena" element={<RecuperarContrasena/>}/>
         </Routes>
       </Router>
     </div>
