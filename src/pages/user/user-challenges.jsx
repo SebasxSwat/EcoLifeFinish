@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trophy, Leaf, Recycle, Droplet, Zap, TreeDeciduous, Bike, ShoppingBag, Utensils, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { jwtDecode } from 'jwt-decode';
+
 
 const iconMap = {
   Recycle: <Recycle className="h-6 w-6" />,
@@ -20,25 +22,34 @@ const iconMap = {
 };
 
 const UserChallenges = () => {
-  // Inicializar el estado con un solo arreglo de desafíos
   const [challenges, setChallenges] = useState([]);
-  const [completedChallenges, setCompletedChallenges] = useState([]); // Lista para desafíos completados
+  const [completedChallenges, setCompletedChallenges] = useState([]); 
   const { toast } = useToast();
 
   useEffect(() => {
     fetchChallenges();
-  }, []);
-
+  }, []);  
+  
   const fetchChallenges = async () => {
+    const token = localStorage.getItem('token');
+    let userId;
+    
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      userId = decodedToken.id;
+    }
+  
     try {
-      const response = await fetch('http://127.0.0.1:8080/challenges/all', {
+      const response = await fetch(`http://127.0.0.1:8080/challenges/user/${userId}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
+      
       if (response.ok) {
         const data = await response.json();
-        setChallenges(data); // Guardar todos los desafíos en challenges
+        setChallenges(data.available_challenges);  
+        setCompletedChallenges(data.completed_challenges);  
       } else {
         toast({
           title: "Error",
@@ -55,42 +66,78 @@ const UserChallenges = () => {
       });
     }
   };
-
-  const handleCompleteChallenge = async (challenge) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:8080/challenges-complete/${challenge.id}/complete`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
   
-      if (response.ok) {
-        toast({
-          title: "¡Desafío completado!",
-          description: `Has ganado ${challenge.points} EcoPoints`,
-        });
-        // Mover el desafío completado a la lista de completados
-        setCompletedChallenges(prev => [...prev, challenge]);
-        // Remover el desafío de la lista de desafíos disponibles
-        setChallenges(prev => prev.filter(c => c.id !== challenge.id));
-      } else {
-        toast({
-          title: "Error",
-          description: "No se pudo completar el desafío",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "Ocurrió un error al completar el desafío",
-        variant: "destructive",
-      });
+  
+  
+  const handleCompleteChallenge = async (challenge) => {
+    const token = localStorage.getItem('token');
+    let userId;
+    if (token) {
+        const decodedToken = jwtDecode(token);
+        userId = decodedToken.id;
     }
-  };
+
+    try {
+        const response = await fetch(`http://127.0.0.1:8080/challenges/complete`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                challenge_id: challenge.id,
+                user_id: userId
+            })
+        });
+
+        if (response.ok) {
+            toast({
+                title: "¡Desafío completado!",
+                description: `Has ganado ${challenge.points} EcoPoints`,
+            });
+
+            setUserData(prevUserData => {
+              const updatedUserData = {
+                  ...prevUserData,
+                  treesPlanted: challenge.challenge_type === 'nature' && challenge.level === 'plata'
+                      ? prevUserData.treesPlanted + 1
+                      : prevUserData.treesPlanted,
+                  wasteRecycled: prevUserData.wasteRecycled + (challenge.challenge_type === 'lifestyle' ? 1.8 : 0),
+                  waterSaved: prevUserData.waterSaved + (challenge.challenge_type === 'water' ? 47.3 : 0),
+                  eco_score: prevUserData.eco_score + challenge.points,
+              };
+          
+              console.log("Updated userData:", updatedUserData); 
+              return updatedUserData;
+          });
+          
+
+            setCompletedChallenges(prev => {
+                const newCompletedChallenges = [...prev, challenge];
+                localStorage.setItem('completedChallenges', JSON.stringify(newCompletedChallenges));
+                return newCompletedChallenges;
+            });
+
+            setChallenges(prev => prev.filter(c => c.id !== challenge.id));
+        } else {
+            const errorData = await response.json();
+            toast({
+                title: "Error",
+                description: errorData.error || "No se pudo completar el desafío",
+                variant: "destructive",
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        toast({
+            title: "Error",
+            description: "Ocurrió un error al completar el desafío",
+            variant: "destructive",
+        });
+    }
+};
+
+
 
   const renderChallengeCard = (challenge, type) => (
     <Card key={challenge.id} className="mb-4">
