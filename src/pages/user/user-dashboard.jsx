@@ -26,9 +26,9 @@ const UserDashboard = () => {
     username: "",
     eco_score: 0, 
     carbon_footprint: 0,
-    treesPlanted: 0,
-    wasteRecycled: 0,
-    waterSaved: 0,
+    trees_planted: 0,
+    waste_recycled: 0,
+    water_saved: 0,
     activities: [],
     badges: [],
   });
@@ -39,7 +39,7 @@ const UserDashboard = () => {
       if (token) {
         const dataUser = jwtDecode(token);
         const userId = dataUser.id;
-  
+
         const carbonFootprintResponse = await fetch(`http://127.0.0.1:8080/carbon-footprint/get/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -69,9 +69,9 @@ const UserDashboard = () => {
             name: userData.name,
             username: userData.username || prevUserData.username,
             eco_score: (userData.eco_score || prevUserData.eco_score) + totalPoints, // Sumar puntos
-            treesPlanted: userData.trees_planted || 0,
-            wasteRecycled: userData.waste_recycled || 0,
-            waterSaved: userData.water_saved || 0,
+            trees_planted: userData.trees_planted || 0,
+            waste_recycled: userData.waste_recycled || 0,
+            water_saved: userData.water_saved || 0,
             activities: userData.activities || [],
             badges: userData.badges || [],
           }));
@@ -82,7 +82,6 @@ const UserDashboard = () => {
     fetchUserData();
   }, []);
   
-
 
   const getEcoScoreColor = (score) => {
     if (score >= 450) return "text-green-600";
@@ -151,7 +150,7 @@ const UserDashboard = () => {
                       Árboles Plantados
                     </p>
                     <p className="text-2xl font-bold text-green-600">
-                      {userData.treesPlanted}
+                      {userData.trees_planted}
                     </p>
                   </div>
                   <TreeDeciduous className="h-10 w-10 text-green-500" />
@@ -166,7 +165,7 @@ const UserDashboard = () => {
                       Residuos Reciclados
                     </p>
                     <p className="text-2xl font-bold text-green-600">
-                      {userData.wasteRecycled} kg
+                      {userData.waste_recycled} kg
                     </p>
                   </div>
                   <Recycle className="h-10 w-10 text-green-500" />
@@ -181,7 +180,7 @@ const UserDashboard = () => {
                       Agua Ahorrada
                     </p>
                     <p className="text-2xl font-bold text-green-600">
-                      {userData.waterSaved} L
+                      {userData.water_saved} L
                     </p>
                   </div>
                   <Droplet className="h-10 w-10 text-blue-500" />

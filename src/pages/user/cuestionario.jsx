@@ -29,6 +29,7 @@ export function CuestionarioHuellaCarbono() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showExitDialog, setShowExitDialog] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -66,8 +67,8 @@ export function CuestionarioHuellaCarbono() {
 
     const handlePopState = (e) => {
       if (shouldBlockNavigation()) {
-        setShowExitDialog(true)
         e.preventDefault()
+        setShowExitDialog(true)
         window.history.pushState(null, '', location.pathname)
       }
     }
@@ -81,10 +82,16 @@ export function CuestionarioHuellaCarbono() {
     }
   }, [shouldBlockNavigation, location.pathname])
 
+  useEffect(() => {
+    if (isExiting) {
+      navigate('/')
+    }
+  }, [isExiting, navigate])
+
   const handleConfirmNavigation = useCallback(() => {
     setShowExitDialog(false)
-    navigate('/')
-  }, [navigate])
+    setIsExiting(true)
+  }, [])
 
   const handleCancelNavigation = useCallback(() => {
     setShowExitDialog(false)
@@ -161,11 +168,11 @@ export function CuestionarioHuellaCarbono() {
 
     let huellaCarbono = 0;
 
-    const consumoElectrico = (respuestas.consumoElectrico / 100) * 3000 * 0.0005;
+    const consumoElectrico = (respuestas.consumoElectrico / 100) * 3000 * 0.0010;
     huellaCarbono += consumoElectrico;
 
     const tipoTransporte = respuestas.tipoTransporte;
-    let impactoTransporte = (tipoTransporte / 100) * 3;
+    let impactoTransporte = (tipoTransporte / 100) * 3.8;
     huellaCarbono += impactoTransporte;
 
     const consumoCarne = (respuestas.consumoCarne / 100) * 3;
@@ -177,7 +184,7 @@ export function CuestionarioHuellaCarbono() {
     const consumoAgua = (respuestas.consumoAgua / 100) * 3.5;
     huellaCarbono += consumoAgua;
 
-    const comprasOnline = (respuestas.comprasOnline / 100) * 3;
+    const comprasOnline = (respuestas.comprasOnline / 100) * 3.2;
     huellaCarbono += comprasOnline;
 
     if (isNaN(huellaCarbono) || huellaCarbono < 0) {
