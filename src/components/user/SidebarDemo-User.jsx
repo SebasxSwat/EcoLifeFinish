@@ -8,6 +8,7 @@ import {
   IconUserBolt,
   IconNews
 } from "@tabler/icons-react";
+import { House } from "lucide-react";
 import { DarkMode } from "../ui/darkMode";
 import { motion } from "framer-motion";
 import UserDashboard from "@/pages/user/user-dashboard";
@@ -57,7 +58,7 @@ export function SidebarDemoUser() {
       label: "Home",
       id: "home",
       icon: (
-        <IconBrandTabler className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
+        <House className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
     },
     {

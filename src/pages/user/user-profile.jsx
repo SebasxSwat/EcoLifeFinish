@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -99,7 +98,7 @@ const UserProfile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://127.0.0.1:8080/user/${user.id}/update`, {
+      const response = await fetch(`http://127.0.0.1:8080/auth/update-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

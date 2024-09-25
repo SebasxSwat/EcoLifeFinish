@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trophy, Leaf, Recycle, Droplet, Zap, TreeDeciduous, Bike, ShoppingBag, Utensils, Plus } from 'lucide-react';
+import { Trophy, Leaf, Recycle, Droplet, Zap, TreeDeciduous, Bike, ShoppingBag, Utensils, Plus, ShowerHead, Flower2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { jwtDecode } from 'jwt-decode';
 
 
 const iconMap = {
   Recycle: <Recycle className="h-6 w-6" />,
+  ShowerHead: <ShowerHead className="h-6 w-6" />,
+  Trash2: <Trash2 className="h-6 w-6" />,
+  Flower2: <Flower2 className="h-6 w-6" />,
   Zap: <Zap className="h-6 w-6" />,
   Bike: <Bike className="h-6 w-6" />,
   Droplet: <Droplet className="h-6 w-6" />,
@@ -152,10 +155,10 @@ const UserChallenges = () => {
       </CardHeader>
       <CardContent>
         <CardDescription className="mb-2">{challenge.description}</CardDescription>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row items-center justify-between my-6 space-y-6 md:space-y-0 md:space-x-4">
           <Badge
             variant="secondary"
-            className="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+            className="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 md:my-4">
             <Trophy className="h-4 w-4 mr-1" />
             {challenge.points} EcoPoints
           </Badge>

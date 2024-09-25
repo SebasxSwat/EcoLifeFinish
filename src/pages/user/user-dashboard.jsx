@@ -28,9 +28,10 @@ const UserDashboard = () => {
     trees_planted: 0,
     waste_recycled: 0,
     water_saved: 0,
-    activities: 0,
+    activities: [],
     badges: [],
   });
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -39,10 +40,11 @@ const UserDashboard = () => {
         const dataUser = jwtDecode(token);
         const userId = dataUser.id;
 
+        // Obtener huella de carbono
         const carbonFootprintResponse = await fetch(`http://127.0.0.1:8080/carbon-footprint/get/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         if (carbonFootprintResponse.ok) {
           const carbonFootprintData = await carbonFootprintResponse.json();
           setUserData((prevUserData) => ({
@@ -50,37 +52,55 @@ const UserDashboard = () => {
             carbon_footprint: carbonFootprintData.value || 0,
           }));
         }
-  
+
+        // Obtener datos del usuario
         const userResponse = await fetch(`http://127.0.0.1:8080/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         if (userResponse.ok) {
           const userData = await userResponse.json();
-  
+
           const totalPoints = Array.isArray(userData.completedChallenges)
             ? userData.completedChallenges.reduce((sum, challenge) => sum + challenge.points, 0)
-            : 0; 
-  
+            : 0;
+
           setUserData((prevUserData) => ({
             ...prevUserData,
             id: userId,
             name: userData.name,
             username: userData.username || prevUserData.username,
-            eco_score: (userData.eco_score || prevUserData.eco_score) + totalPoints, // Sumar puntos
+            eco_score: (userData.eco_score || prevUserData.eco_score) + totalPoints,
             trees_planted: userData.trees_planted || 0,
             waste_recycled: userData.waste_recycled || 0,
             water_saved: userData.water_saved || 0,
-            activities: userData.activities || [],
             badges: userData.badges || [],
+          }));
+        }
+
+        const activitiesResponse = await fetch(`http://127.0.0.1:8080/activities/all/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (activitiesResponse.ok) {
+          const activitiesData = await activitiesResponse.json();
+          setUserData((prevUserData) => ({
+            ...prevUserData,
+            activities: Array.isArray(activitiesData) ? activitiesData : [], 
           }));
         }
       }
     };
-  
+
     fetchUserData();
   }, []);
-  
+
+  const formattedActivities = Array.isArray(userData.activities)
+    ? userData.activities.map(activity => ({
+        date: new Date(activity.date_completed).toLocaleDateString(), 
+        score: userData.eco_score, 
+      }))
+    : [];
 
   const getEcoScoreColor = (score) => {
     if (score >= 450) return "text-green-600";
@@ -198,7 +218,7 @@ const UserDashboard = () => {
               <CardContent>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={userData.activities}>
+                    <LineChart data={formattedActivities}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
                       <YAxis />
