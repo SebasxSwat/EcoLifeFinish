@@ -91,34 +91,21 @@ const UserChallenges = () => {
         });
 
         if (response.ok) {
+            // Mostrar mensaje de éxito
             toast({
                 title: "¡Desafío completado!",
                 description: `Has ganado ${challenge.points} EcoPoints`,
             });
 
-            setUserData(prevUserData => {
-              const updatedUserData = {
-                  ...prevUserData,
-                  treesPlanted: challenge.challenge_type === 'nature' && challenge.level === 'plata'
-                      ? prevUserData.treesPlanted + 1
-                      : prevUserData.treesPlanted,
-                  wasteRecycled: prevUserData.wasteRecycled + (challenge.challenge_type === 'lifestyle' ? 1.8 : 0),
-                  waterSaved: prevUserData.waterSaved + (challenge.challenge_type === 'water' ? 47.3 : 0),
-                  eco_score: prevUserData.eco_score + challenge.points,
-              };
-          
-              console.log("Updated userData:", updatedUserData); 
-              return updatedUserData;
-          });
-          
-
-            setCompletedChallenges(prev => {
-                const newCompletedChallenges = [...prev, challenge];
-                localStorage.setItem('completedChallenges', JSON.stringify(newCompletedChallenges));
-                return newCompletedChallenges;
+            // Mueve el desafío completado a la lista de desafíos completados
+            setCompletedChallenges(prevCompleted => {
+                const updatedCompleted = [...prevCompleted, challenge];
+                localStorage.setItem('completedChallenges', JSON.stringify(updatedCompleted)); // Guarda en localStorage
+                return updatedCompleted; // Actualiza el estado de los desafíos completados
             });
 
-            setChallenges(prev => prev.filter(c => c.id !== challenge.id));
+            // Remover el desafío completado de la lista de desafíos disponibles
+            setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challenge.id));
         } else {
             const errorData = await response.json();
             toast({
@@ -136,6 +123,8 @@ const UserChallenges = () => {
         });
     }
 };
+
+
 
 
 
