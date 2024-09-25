@@ -24,32 +24,48 @@ const iconMap = {
 const UserChallenges = () => {
   const [challenges, setChallenges] = useState([]);
   const [completedChallenges, setCompletedChallenges] = useState([]); 
+  const [treesPlanted, setTreesPlanted] = useState(0); 
+  const [waterSaved, setWaterSaved] = useState(0); 
+  const [wasteRecycled, setWasteRecycled] = useState(0); 
   const { toast } = useToast();
 
   useEffect(() => {
     fetchChallenges();
-  }, []);  
-  
+    const savedTrees = localStorage.getItem('treesPlanted') || 0;
+    const savedWater = localStorage.getItem('waterSaved') || 0;
+    const savedWaste = localStorage.getItem('wasteRecycled') || 0;
+
+    setTreesPlanted(parseInt(savedTrees, 10));
+    setWaterSaved(parseInt(savedWater, 10));
+    setWasteRecycled(parseInt(savedWaste, 10));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('treesPlanted', treesPlanted);
+    localStorage.setItem('waterSaved', waterSaved);
+    localStorage.setItem('wasteRecycled', wasteRecycled);
+  }, [treesPlanted, waterSaved, wasteRecycled]);
+
   const fetchChallenges = async () => {
     const token = localStorage.getItem('token');
     let userId;
-    
+
     if (token) {
       const decodedToken = jwtDecode(token);
       userId = decodedToken.id;
     }
-  
+
     try {
       const response = await fetch(`http://127.0.0.1:8080/challenges/user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
-        setChallenges(data.available_challenges);  
-        setCompletedChallenges(data.completed_challenges);  
+        setChallenges(data.available_challenges);
+        setCompletedChallenges(data.completed_challenges);
       } else {
         toast({
           title: "Error",
@@ -66,77 +82,60 @@ const UserChallenges = () => {
       });
     }
   };
-  
-  
-  
+
   const handleCompleteChallenge = async (challenge) => {
     const token = localStorage.getItem('token');
     let userId;
     if (token) {
-        const decodedToken = jwtDecode(token);
-        userId = decodedToken.id;
+      const decodedToken = jwtDecode(token);
+      userId = decodedToken.id;
     }
 
     try {
-        const response = await fetch(`http://127.0.0.1:8080/challenges/complete`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                challenge_id: challenge.id,
-                user_id: userId
-            })
-        });
+      const response = await fetch(`http://127.0.0.1:8080/challenges/complete`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          challenge_id: challenge.id,
+          user_id: userId
+        })
+      });
 
-        if (response.ok) {
-            toast({
-                title: "¡Desafío completado!",
-                description: `Has ganado ${challenge.points} EcoPoints`,
-            });
+      if (response.ok) {
+        const result = await response.json(); 
 
-            setUserData(prevUserData => {
-              const updatedUserData = {
-                  ...prevUserData,
-                  treesPlanted: challenge.challenge_type === 'nature' && challenge.level === 'plata'
-                      ? prevUserData.treesPlanted + 1
-                      : prevUserData.treesPlanted,
-                  wasteRecycled: prevUserData.wasteRecycled + (challenge.challenge_type === 'lifestyle' ? 1.8 : 0),
-                  waterSaved: prevUserData.waterSaved + (challenge.challenge_type === 'water' ? 47.3 : 0),
-                  eco_score: prevUserData.eco_score + challenge.points,
-              };
-          
-              console.log("Updated userData:", updatedUserData); 
-              return updatedUserData;
-          });
-          
-
-            setCompletedChallenges(prev => {
-                const newCompletedChallenges = [...prev, challenge];
-                localStorage.setItem('completedChallenges', JSON.stringify(newCompletedChallenges));
-                return newCompletedChallenges;
-            });
-
-            setChallenges(prev => prev.filter(c => c.id !== challenge.id));
-        } else {
-            const errorData = await response.json();
-            toast({
-                title: "Error",
-                description: errorData.error || "No se pudo completar el desafío",
-                variant: "destructive",
-            });
-        }
-    } catch (error) {
-        console.error('Error:', error);
         toast({
-            title: "Error",
-            description: "Ocurrió un error al completar el desafío",
-            variant: "destructive",
+          title: "¡Desafío completado!",
+          description: `Has ganado ${challenge.points} EcoPoints`,
         });
-    }
-};
 
+        setCompletedChallenges(prevCompleted => {
+          const updatedCompleted = [...prevCompleted, challenge];
+          localStorage.setItem('completedChallenges', JSON.stringify(updatedCompleted)); 
+          return updatedCompleted; 
+        });
+
+        setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challenge.id));
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.error || "No se pudo completar el desafío",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Ocurrió un error al completar el desafío",
+        variant: "destructive",
+      });
+    }
+  };
 
 
   const renderChallengeCard = (challenge, type) => (
@@ -192,7 +191,6 @@ const UserChallenges = () => {
             </TabsList>
             <TabsContent value="completed">
               <ScrollArea className="h-[60vh]">
-                {/* Mostrar desafíos completados */}
                 {completedChallenges.length > 0 ? (
                   completedChallenges.map(challenge => renderChallengeCard(challenge, 'completed'))
                 ) : (
@@ -202,7 +200,6 @@ const UserChallenges = () => {
             </TabsContent>
             <TabsContent value="available">
               <ScrollArea className="h-[60vh]">
-                {/* Mostrar desafíos disponibles */}
                 {challenges.length > 0 ? (
                   challenges.map(challenge => renderChallengeCard(challenge, 'available'))
                 ) : (
