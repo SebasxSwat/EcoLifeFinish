@@ -24,14 +24,13 @@ const iconMap = {
 const UserChallenges = () => {
   const [challenges, setChallenges] = useState([]);
   const [completedChallenges, setCompletedChallenges] = useState([]); 
-  const [treesPlanted, setTreesPlanted] = useState(0); // Estado para árboles plantados
-  const [waterSaved, setWaterSaved] = useState(0); // Estado para agua ahorrada
-  const [wasteRecycled, setWasteRecycled] = useState(0); // Estado para residuos reciclados
+  const [treesPlanted, setTreesPlanted] = useState(0); 
+  const [waterSaved, setWaterSaved] = useState(0); 
+  const [wasteRecycled, setWasteRecycled] = useState(0); 
   const { toast } = useToast();
 
   useEffect(() => {
     fetchChallenges();
-    // Cargar los datos del localStorage al iniciar
     const savedTrees = localStorage.getItem('treesPlanted') || 0;
     const savedWater = localStorage.getItem('waterSaved') || 0;
     const savedWaste = localStorage.getItem('wasteRecycled') || 0;
@@ -41,7 +40,6 @@ const UserChallenges = () => {
     setWasteRecycled(parseInt(savedWaste, 10));
   }, []);
 
-  // Guardar los datos en localStorage cada vez que cambian
   useEffect(() => {
     localStorage.setItem('treesPlanted', treesPlanted);
     localStorage.setItem('waterSaved', waterSaved);
@@ -107,22 +105,19 @@ const UserChallenges = () => {
       });
 
       if (response.ok) {
-        const result = await response.json(); // Obtener resultado aquí
+        const result = await response.json(); 
 
-        // Mostrar mensaje de éxito
         toast({
           title: "¡Desafío completado!",
           description: `Has ganado ${challenge.points} EcoPoints`,
         });
 
-        // Mueve el desafío completado a la lista de desafíos completados
         setCompletedChallenges(prevCompleted => {
           const updatedCompleted = [...prevCompleted, challenge];
-          localStorage.setItem('completedChallenges', JSON.stringify(updatedCompleted)); // Guarda en localStorage
-          return updatedCompleted; // Actualiza el estado de los desafíos completados
+          localStorage.setItem('completedChallenges', JSON.stringify(updatedCompleted)); 
+          return updatedCompleted; 
         });
 
-        // Remover el desafío completado de la lista de desafíos disponibles
         setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challenge.id));
       } else {
         const errorData = await response.json();
@@ -196,7 +191,6 @@ const UserChallenges = () => {
             </TabsList>
             <TabsContent value="completed">
               <ScrollArea className="h-[60vh]">
-                {/* Mostrar desafíos completados */}
                 {completedChallenges.length > 0 ? (
                   completedChallenges.map(challenge => renderChallengeCard(challenge, 'completed'))
                 ) : (
@@ -206,7 +200,6 @@ const UserChallenges = () => {
             </TabsContent>
             <TabsContent value="available">
               <ScrollArea className="h-[60vh]">
-                {/* Mostrar desafíos disponibles */}
                 {challenges.length > 0 ? (
                   challenges.map(challenge => renderChallengeCard(challenge, 'available'))
                 ) : (
