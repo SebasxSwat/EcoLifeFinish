@@ -28,7 +28,7 @@ const UserDashboard = () => {
     trees_planted: 0,
     waste_recycled: 0,
     water_saved: 0,
-    activities: [],
+    activities: 0,
     badges: [],
   });
 
