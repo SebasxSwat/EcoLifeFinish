@@ -17,14 +17,14 @@ import {
 } from "recharts";
 import { jwtDecode } from "jwt-decode";
 
-const AVERAGE_CARBON_FOOTPRINT = 4.75;
+const AVERAGE_CARBON_FOOTPRINT = 4.65;
 
 const UserDashboard = () => {
   const [userData, setUserData] = useState({
     id: "",
     name: "",
     username: "",
-    eco_score: 0,
+    eco_score: 0, 
     carbon_footprint: 0,
     treesPlanted: 0,
     wasteRecycled: 0,
@@ -36,71 +36,53 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
-
-      if (token && typeof token === "string") {
-        try {
-          const dataUser = jwtDecode(token);
-          const userId = dataUser.id;
-
-          const carbonFootprintResponse = await fetch(
-            `http://127.0.0.1:8080/carbon-footprint/get/${userId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (carbonFootprintResponse.ok) {
-            const carbonFootprintData = await carbonFootprintResponse.json();
-
-            setUserData((prevUserData) => ({
-              ...prevUserData,
-              carbon_footprint: carbonFootprintData.value || 0,
-            }));
-          } else {
-            console.error("Error al obtener la huella de carbono.");
-          }
-
-          const userResponse = await fetch(
-            `http://127.0.0.1:8080/user/${userId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            setUserData((prevUserData) => ({
-              ...prevUserData,
-              id: userId,
-              name: userData.name,
-              username: userData.username || prevUserData.username,
-              eco_score: userData.eco_score || prevUserData.eco_score,
-              treesPlanted: userData.trees_planted || 0,
-              wasteRecycled: userData.waste_recycled || 0,
-              waterSaved: userData.water_saved || 0,
-              activities: userData.activities || [],
-              badges: userData.badges || [],
-            }));
-          } else {
-            console.error("Error al obtener los datos del usuario.");
-          }
-        } catch (error) {
-          console.error(
-            "Error al decodificar el token o hacer la solicitud:",
-            error
-          );
+      if (token) {
+        const dataUser = jwtDecode(token);
+        const userId = dataUser.id;
+  
+        const carbonFootprintResponse = await fetch(`http://127.0.0.1:8080/carbon-footprint/get/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        if (carbonFootprintResponse.ok) {
+          const carbonFootprintData = await carbonFootprintResponse.json();
+          setUserData((prevUserData) => ({
+            ...prevUserData,
+            carbon_footprint: carbonFootprintData.value || 0,
+          }));
         }
-      } else {
-        console.error("Token no disponible o no es una cadena.");
+  
+        const userResponse = await fetch(`http://127.0.0.1:8080/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+  
+          const totalPoints = Array.isArray(userData.completedChallenges)
+            ? userData.completedChallenges.reduce((sum, challenge) => sum + challenge.points, 0)
+            : 0; 
+  
+          setUserData((prevUserData) => ({
+            ...prevUserData,
+            id: userId,
+            name: userData.name,
+            username: userData.username || prevUserData.username,
+            eco_score: (userData.eco_score || prevUserData.eco_score) + totalPoints, // Sumar puntos
+            treesPlanted: userData.trees_planted || 0,
+            wasteRecycled: userData.waste_recycled || 0,
+            waterSaved: userData.water_saved || 0,
+            activities: userData.activities || [],
+            badges: userData.badges || [],
+          }));
+        }
       }
     };
-
+  
     fetchUserData();
   }, []);
+  
+
 
   const getEcoScoreColor = (score) => {
     if (score >= 450) return "text-green-600";
