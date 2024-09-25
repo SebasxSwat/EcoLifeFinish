@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -23,6 +24,11 @@ const UserProfile = () => {
 
   const [editMode, setEditMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -79,6 +85,44 @@ const UserProfile = () => {
       setEditMode(false);
     } catch (error) {
       console.error('Error al guardar los cambios:', error);
+    }
+  };
+
+  const handlePasswordUpdate = async () => {
+    setPasswordError("");
+    setPasswordSuccess("");
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Las contraseñas nuevas no coinciden");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://127.0.0.1:8080/user/${user.id}/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          current_password: currentPassword,
+          new_password: newPassword,
+        }), 
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al actualizar la contraseña');
+      }
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordSuccess("Contraseña actualizada con éxito");
+    } catch (error) {
+      console.error('Error al actualizar la contraseña:', error);
+      setPasswordError(error.message);
     }
   };
 
@@ -228,11 +272,14 @@ const UserProfile = () => {
                         id="current-password"
                         type={showPassword ? "text" : "password"}
                         placeholder="Contraseña actual"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
                         {showPassword ? (
                           <EyeOff className="h-5 w-5 text-gray-400" />
@@ -248,9 +295,34 @@ const UserProfile = () => {
                       id="new-password"
                       type="password"
                       placeholder="Ingresa tu nueva contraseña"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
                     />
                   </div>
-                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirmar Nueva Contraseña</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="Confirma tu nueva contraseña"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </div>
+                  {passwordError && (
+                    <p className="text-sm text-red-600" role="alert">
+                      {passwordError}
+                    </p>
+                  )}
+                  {passwordSuccess && (
+                    <p className="text-sm text-green-600" role="alert">
+                      {passwordSuccess}
+                    </p>
+                  )}
+                  <Button 
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={handlePasswordUpdate}
+                  >
                     <Lock className="mr-2 h-4 w-4" /> Actualizar Contraseña
                   </Button>
                 </CardContent>
