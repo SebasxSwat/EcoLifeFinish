@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,14 +19,23 @@ import { Link } from "react-router-dom";
 
 const RestablecerContrasena = () => {
   const [formData, setFormData] = useState({
-    new_password: "",
-    confirm_password: "",
+    nueva_contrasena: "",
+    confirmar_contrasena: "",
   });
-  const [message, setMessage] = useState("");
+  const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const token = new URLSearchParams(location.search).get("token");
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    const urlToken = new URLSearchParams(location.search).get("token");
+    if (urlToken) {
+      setToken(urlToken);
+    } else {
+      setError("No se proporcionó un token válido en la URL.");
+    }
+  }, [location]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,9 +44,9 @@ const RestablecerContrasena = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setMessage("");
+    setMensaje("");
 
-    if (formData.new_password !== formData.confirm_password) {
+    if (formData.nueva_contrasena !== formData.confirmar_contrasena) {
       setError("Las contraseñas no coinciden");
       return;
     }
@@ -46,20 +55,19 @@ const RestablecerContrasena = () => {
       const response = await fetch("http://127.0.0.1:8080/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, new_password: formData.new_password }),
+        body: JSON.stringify({ token, new_password: formData.nueva_contrasena }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Ocurrió un error al restablecer la contraseña");
-        return;
+        throw new Error(data.message || "Ocurrió un error al restablecer la contraseña");
       }
 
-      setMessage(data.message || "Contraseña restablecida con éxito");
+      setMensaje(data.message || "Contraseña restablecida con éxito");
       setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
-      setError("Ocurrió un error. Por favor, intenta de nuevo.");
+      setError(err.message || "Ocurrió un error. Por favor, intenta de nuevo.");
     }
   };
 
@@ -78,25 +86,25 @@ const RestablecerContrasena = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="new_password">Nueva Contraseña</Label>
+              <Label htmlFor="nueva_contrasena">Nueva Contraseña</Label>
               <Input
-                id="new_password"
-                name="new_password"
+                id="nueva_contrasena"
+                name="nueva_contrasena"
                 type="password"
                 required
-                value={formData.new_password}
+                value={formData.nueva_contrasena}
                 onChange={handleChange}
                 placeholder="Ingresa tu nueva contraseña"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm_password">Confirmar Contraseña</Label>
+              <Label htmlFor="confirmar_contrasena">Confirmar Contraseña</Label>
               <Input
-                id="confirm_password"
-                name="confirm_password"
+                id="confirmar_contrasena"
+                name="confirmar_contrasena"
                 type="password"
                 required
-                value={formData.confirm_password}
+                value={formData.confirmar_contrasena}
                 onChange={handleChange}
                 placeholder="Confirma tu nueva contraseña"
               />
@@ -108,11 +116,11 @@ const RestablecerContrasena = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            {message && (
+            {mensaje && (
               <Alert variant="success" className="bg-green-100 border-green-400 text-green-700">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Éxito</AlertTitle>
-                <AlertDescription>{message}</AlertDescription>
+                <AlertDescription>{mensaje}</AlertDescription>
               </Alert>
             )}
             <Button
