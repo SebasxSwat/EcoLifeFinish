@@ -6,7 +6,7 @@ import {
   IconBrandTabler,
   IconTrophy,
   IconUserBolt,
-  IconNews
+  IconNews,
 } from "@tabler/icons-react";
 import { House } from "lucide-react";
 import { DarkMode } from "../ui/darkMode";
@@ -20,7 +20,7 @@ export function SidebarDemoUser() {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [isMobile, setIsMobile] = useState(false);
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -28,10 +28,10 @@ export function SidebarDemoUser() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); 
+      setIsMobile(window.innerWidth <= 768);
     };
 
-    handleResize(); 
+    handleResize();
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -42,14 +42,13 @@ export function SidebarDemoUser() {
   const handleOptionClick = (id) => {
     setCurrentPage(id);
     if (isMobile) {
-      setOpen(false); 
+      setOpen(false);
     }
   };
 
   const handleLogout = () => {
-
     localStorage.removeItem("token");
-    
+
     navigate("/login");
   };
 
@@ -88,7 +87,7 @@ export function SidebarDemoUser() {
       icon: (
         <IconArrowLeft className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
-      onClick: handleLogout 
+      onClick: handleLogout,
     },
   ];
 
@@ -99,26 +98,30 @@ export function SidebarDemoUser() {
       case "desafio":
         return <UserChallenges />;
       case "noticias":
-        return <NoticiasEcologicas/>;
+        return <NoticiasEcologicas />;
       default:
         return <UserDashboard />;
     }
   };
 
   return (
-    <div className="rounded-md flex flex-col md:flex-row w-screen text-lg font-bold bg-gray-100 dark:bg-neutral-800 flex-1 max-w-8xl mx-auto border border-neutral-200 dark:border-black overflow-hidden min-h-screen">
-      <Sidebar open={open} setOpen={setOpen} className="w-96">
+    <div className="flex flex-col md:flex-row w-full h-screen overflow-hidden">
+      <Sidebar
+        open={open}
+        setOpen={setOpen}
+        className="w-full md:w-64 flex-shrink-0 z-10"
+      >
         <SidebarBody className="justify-between gap-10 bg-gray-500 dark:bg-neutral-900 text-white dark:text-white border-2 border-neutral-700 dark:border-neutral-600 rounded-lg">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-5">
+            <div className="mt-16 flex flex-col gap-5">
               {links.map((link, idx) => (
                 <SidebarLink
                   key={idx}
                   link={link}
                   onClick={() => {
                     if (link.id === "logout") {
-                      handleLogout(); 
+                      handleLogout();
                     } else {
                       handleOptionClick(link.id);
                     }
@@ -135,8 +138,8 @@ export function SidebarDemoUser() {
           )}
         </SidebarBody>
       </Sidebar>
-      <main className="flex flex-1 min-h-screen overflow-y-auto">
-        <div className="p-2 md:p-10 rounded-tl-2xl dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full min-h-full">
+      <main className="flex-1 overflow-y-auto bg-white dark:bg-neutral-900">
+      <div className="p-2 md:p-10 rounded-tl-2xl dark:border-neutral-700">
           {renderMainContent()}
         </div>
       </main>

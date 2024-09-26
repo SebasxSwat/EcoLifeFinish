@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trophy, Leaf, Recycle, Droplet, Zap, TreeDeciduous, Bike, ShoppingBag, Utensils, Plus, ShowerHead, Flower2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { jwtDecode } from 'jwt-decode';
-
+import { motion, AnimatePresence } from 'framer-motion';
 
 const iconMap = {
   Recycle: <Recycle className="h-6 w-6" />,
@@ -26,10 +26,12 @@ const iconMap = {
 
 const UserChallenges = () => {
   const [challenges, setChallenges] = useState([]);
-  const [completedChallenges, setCompletedChallenges] = useState([]); 
-  const [treesPlanted, setTreesPlanted] = useState(0); 
-  const [waterSaved, setWaterSaved] = useState(0); 
-  const [wasteRecycled, setWasteRecycled] = useState(0); 
+  const [completedChallenges, setCompletedChallenges] = useState([]);
+  const [treesPlanted, setTreesPlanted] = useState(0);
+  const [waterSaved, setWaterSaved] = useState(0);
+  const [wasteRecycled, setWasteRecycled] = useState(0);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [completedChallenge, setCompletedChallenge] = useState(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -92,11 +94,10 @@ const UserChallenges = () => {
   
     if (token) {
       const decodedToken = jwtDecode(token);
-      userId = decodedToken.id; // Decodificar el token para obtener el userId
+      userId = decodedToken.id;
     }
   
     try {
-      // Primero, completa el desafío
       const response = await fetch(`http://127.0.0.1:8080/challenges/complete`, {
         method: 'POST',
         headers: {
@@ -110,25 +111,20 @@ const UserChallenges = () => {
       });
   
       if (response.ok) {
-        const result = await response.json(); 
+        const result = await response.json();
   
-        // Mostrar el éxito con toast
-        toast({
-          title: "¡Desafío completado!",
-          description: `Has ganado ${challenge.points} EcoPoints`,
-        });
-  
-        // Guardar el desafío completado en el estado y localStorage
         setCompletedChallenges(prevCompleted => {
           const updatedCompleted = [...prevCompleted, challenge];
-          localStorage.setItem('completedChallenges', JSON.stringify(updatedCompleted)); 
-          return updatedCompleted; 
+          localStorage.setItem('completedChallenges', JSON.stringify(updatedCompleted));
+          return updatedCompleted;
         });
   
-        // Eliminar el desafío de la lista de desafíos
         setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challenge.id));
   
-        // Aquí es donde añadimos la llamada a la API para crear la actividad
+        // Trigger animation
+        setCompletedChallenge(challenge);
+        setShowAnimation(true);
+  
         const activityResponse = await fetch(`http://127.0.0.1:8080/activities/create`, {
           method: 'POST',
           headers: {
@@ -136,8 +132,8 @@ const UserChallenges = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            challenge_id: challenge.id, // Pasamos el id del desafío completado
-            user_id: userId // Pasamos el id del usuario
+            challenge_id: challenge.id,
+            user_id: userId
           })
         });
   
@@ -166,8 +162,6 @@ const UserChallenges = () => {
       });
     }
   };
-  
-
 
   const renderChallengeCard = (challenge, type) => (
     <Card key={challenge.id} className="mb-4">
@@ -241,6 +235,60 @@ const UserChallenges = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      <AnimatePresence>
+        {showAnimation && completedChallenge && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            onClick={() => setShowAnimation(false)}
+          >
+            <motion.div
+              initial={{ y: -100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 100 }}
+              className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl text-center"
+            >
+              <motion.h2
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="text-3xl font-bold mb-4 text-green-600 dark:text-green-400"
+              >
+                ¡Desafío Completado!
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-xl mb-6 text-green-400"
+              >
+                {completedChallenge.name}
+              </motion.p>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1, rotate: 360 }}
+                transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
+                className="text-5xl mb-6"
+              >
+                🏆
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="text-2xl font-bold text-green-600 dark:text-green-400"
+              >
+                +{completedChallenge.points} EcoPoints
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
