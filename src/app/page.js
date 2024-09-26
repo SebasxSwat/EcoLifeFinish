@@ -11,6 +11,7 @@ import RecuperarContrasena from "@/pages/componente-recuperar-contra";
 import { SidebarDemoUser } from "@/components/user/SidebarDemo-User";
 import { CuestionarioHuellaCarbono } from "@/pages/user/cuestionario";
 import RestablecerContrasena from "@/pages/componente-restablecer-contra";
+import { SidebarDemo } from "@/components/admin/SidebarDemo";
 
 function Page() {
   const [data, setData] = useState(null);
@@ -42,6 +43,7 @@ function Page() {
           <Route path="/cuestionario" element={<CuestionarioHuellaCarbono/>}/>
           <Route path="/restablecer-contrasena" element={<RestablecerContrasena/>}/>
           <Route path="/recuperar-contrasena" element={<RecuperarContrasena/>}/>
+          <Route path="/dashboardAdmin" element={<SidebarDemo/>}/>
         </Routes>
       </Router>
     </div>
