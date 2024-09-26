@@ -23,7 +23,7 @@ const UserDashboard = () => {
     id: "",
     name: "",
     username: "",
-    eco_score: 0, 
+    eco_score: 0,
     carbon_footprint: 0,
     trees_planted: 0,
     waste_recycled: 0,
@@ -32,7 +32,6 @@ const UserDashboard = () => {
     badges: [],
   });
 
-
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
@@ -40,10 +39,12 @@ const UserDashboard = () => {
         const dataUser = jwtDecode(token);
         const userId = dataUser.id;
 
-        // Obtener huella de carbono
-        const carbonFootprintResponse = await fetch(`http://127.0.0.1:8080/carbon-footprint/get/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const carbonFootprintResponse = await fetch(
+          `http://127.0.0.1:8080/carbon-footprint/get/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         if (carbonFootprintResponse.ok) {
           const carbonFootprintData = await carbonFootprintResponse.json();
@@ -53,16 +54,21 @@ const UserDashboard = () => {
           }));
         }
 
-        // Obtener datos del usuario
-        const userResponse = await fetch(`http://127.0.0.1:8080/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const userResponse = await fetch(
+          `http://127.0.0.1:8080/user/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         if (userResponse.ok) {
           const userData = await userResponse.json();
 
           const totalPoints = Array.isArray(userData.completedChallenges)
-            ? userData.completedChallenges.reduce((sum, challenge) => sum + challenge.points, 0)
+            ? userData.completedChallenges.reduce(
+                (sum, challenge) => sum + challenge.points,
+                0
+              )
             : 0;
 
           setUserData((prevUserData) => ({
@@ -70,7 +76,8 @@ const UserDashboard = () => {
             id: userId,
             name: userData.name,
             username: userData.username || prevUserData.username,
-            eco_score: (userData.eco_score || prevUserData.eco_score) + totalPoints,
+            eco_score:
+              (userData.eco_score || prevUserData.eco_score) + totalPoints,
             trees_planted: userData.trees_planted || 0,
             waste_recycled: userData.waste_recycled || 0,
             water_saved: userData.water_saved || 0,
@@ -78,15 +85,18 @@ const UserDashboard = () => {
           }));
         }
 
-        const activitiesResponse = await fetch(`http://127.0.0.1:8080/activities/all/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const activitiesResponse = await fetch(
+          `http://127.0.0.1:8080/activities/all/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         if (activitiesResponse.ok) {
           const activitiesData = await activitiesResponse.json();
           setUserData((prevUserData) => ({
             ...prevUserData,
-            activities: Array.isArray(activitiesData) ? activitiesData : [], 
+            activities: Array.isArray(activitiesData) ? activitiesData : [],
           }));
         }
       }
@@ -96,11 +106,19 @@ const UserDashboard = () => {
   }, []);
 
   const formattedActivities = Array.isArray(userData.activities)
-    ? userData.activities.map(activity => ({
-        date: new Date(activity.date_completed).toLocaleDateString(), 
-        score: userData.eco_score, 
-      }))
-    : [];
+  ? userData.activities.reduce((acc, activity, index) => {
+      const previousScore = index > 0 ? acc[index - 1].score : 0;
+      const updatedScore = previousScore + (activity.challenge?.points || 0); 
+      return [
+        ...acc,
+        {
+          date: new Date(activity.date_completed).toLocaleDateString(),
+          score: updatedScore, 
+        }
+      ];
+    }, [])
+  : [];
+
 
   const getEcoScoreColor = (score) => {
     if (score >= 450) return "text-green-600";
@@ -108,9 +126,10 @@ const UserDashboard = () => {
     return "text-red-600";
   };
 
-  const carbonFootprintColor = userData.carbon_footprint > AVERAGE_CARBON_FOOTPRINT
-    ? "text-red-600"
-    : "text-green-600";
+  const carbonFootprintColor =
+    userData.carbon_footprint > AVERAGE_CARBON_FOOTPRINT
+      ? "text-red-600"
+      : "text-green-600";
 
   return (
     <div className="container mx-auto p-4 bg-gradient-to-br  to-blue-50 min-h-screen">
@@ -163,7 +182,7 @@ const UserDashboard = () => {
             </Card>
             <Card>
               <CardContent className="pt-6">
-               <div className="flex items-center justify-between ">
+                <div className="flex items-center justify-between ">
                   <div>
                     <p className="text-sm font-medium text-gray-500">
                       Árboles Plantados
@@ -205,7 +224,7 @@ const UserDashboard = () => {
                   <Droplet className="h-10 w-10 text-blue-500" />
                 </div>
               </CardContent>
-            </Card> 
+            </Card>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3  gap-6 mb-6">
@@ -228,6 +247,7 @@ const UserDashboard = () => {
                         dataKey="score"
                         stroke="#10B981"
                         strokeWidth={2}
+                        dot={{ r: 5 }} 
                       />
                     </LineChart>
                   </ResponsiveContainer>

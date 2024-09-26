@@ -89,12 +89,14 @@ const UserChallenges = () => {
   const handleCompleteChallenge = async (challenge) => {
     const token = localStorage.getItem('token');
     let userId;
+  
     if (token) {
       const decodedToken = jwtDecode(token);
-      userId = decodedToken.id;
+      userId = decodedToken.id; // Decodificar el token para obtener el userId
     }
-
+  
     try {
+      // Primero, completa el desafío
       const response = await fetch(`http://127.0.0.1:8080/challenges/complete`, {
         method: 'POST',
         headers: {
@@ -106,22 +108,46 @@ const UserChallenges = () => {
           user_id: userId
         })
       });
-
+  
       if (response.ok) {
         const result = await response.json(); 
-
+  
+        // Mostrar el éxito con toast
         toast({
           title: "¡Desafío completado!",
           description: `Has ganado ${challenge.points} EcoPoints`,
         });
-
+  
+        // Guardar el desafío completado en el estado y localStorage
         setCompletedChallenges(prevCompleted => {
           const updatedCompleted = [...prevCompleted, challenge];
           localStorage.setItem('completedChallenges', JSON.stringify(updatedCompleted)); 
           return updatedCompleted; 
         });
-
+  
+        // Eliminar el desafío de la lista de desafíos
         setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challenge.id));
+  
+        // Aquí es donde añadimos la llamada a la API para crear la actividad
+        const activityResponse = await fetch(`http://127.0.0.1:8080/activities/create`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            challenge_id: challenge.id, // Pasamos el id del desafío completado
+            user_id: userId // Pasamos el id del usuario
+          })
+        });
+  
+        if (activityResponse.ok) {
+          console.log("Actividad creada exitosamente");
+        } else {
+          const activityError = await activityResponse.json();
+          console.error("Error al crear la actividad:", activityError.error);
+        }
+  
       } else {
         const errorData = await response.json();
         toast({
@@ -130,6 +156,7 @@ const UserChallenges = () => {
           variant: "destructive",
         });
       }
+  
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -139,6 +166,7 @@ const UserChallenges = () => {
       });
     }
   };
+  
 
 
   const renderChallengeCard = (challenge, type) => (
