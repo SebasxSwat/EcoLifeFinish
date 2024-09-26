@@ -143,7 +143,7 @@ const UserProfile = () => {
               <CardTitle className="text-3xl font-bold text-green-600">
                 {user.name} {user.lastname}
               </CardTitle>
-              <CardDescription className="text-lg text-green-800">
+              <CardDescription className="text-lg text-green-700">
                 Perfil de Usuario EcoLife
               </CardDescription>
             </div>
@@ -250,20 +250,11 @@ const UserProfile = () => {
             <TabsContent value="settings">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl font-semibold text-green-800">
-                    Configuración
+                  <CardTitle className="text-2xl font-semibold text-green-600">
+                    Seguridad
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label className="text-base">Notificaciones</Label>
-                      <p className="text-sm text-gray-500">
-                        Recibe actualizaciones sobre tus logros eco
-                      </p>
-                    </div>
-                    <Switch />
-                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="current-password">Contraseña Actual</Label>
                     <div className="relative">
