@@ -11,6 +11,15 @@ import { Switch } from "@/components/ui/switch";
 import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
+const avatars = [
+  { id: 1, src: "/avatars/tree.png", alt: "Tree Avatar" },
+  { id: 2, src: "/avatars/leaf.png", alt: "Leaf Avatar" },
+  { id: 3, src: "/avatars/flower.png", alt: "Flower Avatar" },
+  { id: 4, src: "/avatars/recycle.png", alt: "Recycle Avatar" },
+  { id: 5, src: "/avatars/water-drop.png", alt: "Water Drop Avatar" },
+  { id: 6, src: "/avatars/sun.png", alt: "Sun Avatar" },
+];
+
 const UserProfile = () => {
   const [user, setUser] = useState({
     id: null,
