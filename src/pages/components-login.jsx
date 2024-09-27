@@ -52,7 +52,7 @@ const Login = () => {
       if (data.first_login) {
         navigate('/cuestionario');
       } else {
-        navigate('/dashboardUser');
+        navigate(data.redirect_url);
       }
 
     } catch (err) {
