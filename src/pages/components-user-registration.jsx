@@ -61,11 +61,13 @@ const UserRegistration = () => {
 
       if (response.success) {
         setSuccess("Registro exitoso. Redirigiendo al inicio de sesión...");
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        navigate("/login");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000); 
       } else {
         setError(response.message || "Error en el registro");
       }
+      
     } catch (err) {
       console.error("Error en la solicitud:", err);
       setError("Ocurrió un error. Por favor, inténtalo de nuevo.");
