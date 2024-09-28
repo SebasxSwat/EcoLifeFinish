@@ -3,7 +3,7 @@ import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import {
   IconArrowLeft,
   IconBrandTabler,
-  IconSettings,
+  IconUsers,
   IconUserBolt,
 } from "@tabler/icons-react";
 import { DarkMode } from "../ui/darkMode";
@@ -39,16 +39,8 @@ export function SidebarDemo() {
       label: "User",
       id: "user",
       icon: (
-        <IconSettings className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
+        <IconUsers className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
-      submenu: [
-        { label: "List Users", id: "user-list", icon: null },
-        {
-          label: "Average Carbon Footprint",
-          id: "average-carbon-footprint",
-          icon: null,
-        },
-      ],
     },
     {
       label: "Logout",
