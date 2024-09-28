@@ -84,6 +84,7 @@ export default function AdminUserList() {
         <Table>
           <TableHeader>
             <TableRow className="bg-green-50 dark:bg-gray-700">
+              <TableHead className="text-green-800 dark:text-green-400">Usuario</TableHead>
               <TableHead className="text-green-800 dark:text-green-400">Nombre</TableHead>
               <TableHead className="text-green-800 dark:text-green-400">Email</TableHead>
               <TableHead className="text-green-800 dark:text-green-400">Rol</TableHead>
@@ -94,6 +95,7 @@ export default function AdminUserList() {
           <TableBody>
             {filteredUsers.map((user) => (
               <TableRow key={user.id} className="border-b border-green-100 dark:border-gray-600">
+                <TableCell className="font-medium text-gray-900 dark:text-gray-100">{user.username}</TableCell>
                 <TableCell className="font-medium text-gray-900 dark:text-gray-100">{user.name}</TableCell>
                 <TableCell className="text-gray-700 dark:text-gray-300">{user.email}</TableCell>
                 <TableCell className="text-gray-700 dark:text-gray-300">{user.role}</TableCell>
