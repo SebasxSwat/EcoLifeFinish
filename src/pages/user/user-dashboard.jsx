@@ -62,7 +62,7 @@ const UserDashboard = () => {
 
         if (carbonFootprintResponse.ok) {
           const carbonFootprintData = await carbonFootprintResponse.json();
-          setUserData((prevUserData) => ({
+          setUserData(prevUserData => ({
             ...prevUserData,
             carbon_footprint: carbonFootprintData.value || 0,
           }));
@@ -85,7 +85,7 @@ const UserDashboard = () => {
               )
             : 0;
 
-          setUserData((prevUserData) => ({
+          setUserData(prevUserData => ({
             ...prevUserData,
             id: userId,
             name: userData.name,
@@ -108,7 +108,7 @@ const UserDashboard = () => {
 
         if (badgesResponse.ok) {
           const badgesData = await badgesResponse.json();
-          setUserData((prevUserData) => ({
+          setUserData(prevUserData => ({
             ...prevUserData,
             badges: {
               unlocked: badgesData.unlocked || [],
@@ -126,7 +126,7 @@ const UserDashboard = () => {
 
         if (activitiesResponse.ok) {
           const activitiesData = await activitiesResponse.json();
-          setUserData((prevUserData) => ({
+          setUserData(prevUserData => ({
             ...prevUserData,
             activities: Array.isArray(activitiesData) ? activitiesData : [],
           }));
@@ -151,7 +151,7 @@ const UserDashboard = () => {
       }, [])
     : [];
 
-  const getEcoScoreColor = (score) => {
+  const getEcoScoreColor = score => {
     if (score >= 450) return "text-green-600";
     if (score >= 280) return "text-yellow-600";
     return "text-red-600";
@@ -162,7 +162,7 @@ const UserDashboard = () => {
       ? "text-red-600"
       : "text-green-600";
 
-  const handleBadgeClick = (badge) => {
+  const handleBadgeClick = badge => {
     setSelectedBadge(badge);
   };
 
@@ -298,7 +298,7 @@ const UserDashboard = () => {
               <CardContent>
                 {userData.badges?.unlocked &&
                 userData.badges.unlocked.length > 0 ? (
-                  userData.badges.unlocked.map((badge) => (
+                  userData.badges.unlocked.map(badge => (
                     <motion.div
                       key={badge.id}
                       className="flex items-center space-x-2"
@@ -323,7 +323,7 @@ const UserDashboard = () => {
                       <h3 className="font-semibold text-lg text-green-600">
                         Insignias por desbloquear:
                       </h3>
-                      {userData.badges.locked.map((badge) => (
+                      {userData.badges.locked.map(badge => (
                         <div
                           key={badge.id}
                           className="flex items-center space-x-2 cursor-pointer"
@@ -376,10 +376,7 @@ const UserDashboard = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center text-white justify-between">
               <span>Requisitos de la Insignia</span>
-              <Button
-                size="icon"
-                onClick={() => setSelectedBadge(null)}
-              >
+              <Button size="icon" onClick={() => setSelectedBadge(null)}>
                 <X className="h-4 w-4" />
               </Button>
             </DialogTitle>
@@ -400,36 +397,88 @@ const UserDashboard = () => {
                     </h3>
                     <p className="mt-2">{selectedBadge.description}</p>
                     <div className="mt-4">
-                      {selectedBadge.required_challenges > 0 && (
-                        <p>
-                          <strong>Desafíos requeridos:</strong>{" "}
-                          {selectedBadge.required_challenges}
-                        </p>
-                      )}
-                      {selectedBadge.eco_points_required > 0 && (
-                        <p>
-                          <strong>Puntos Ecológicos requeridos:</strong>{" "}
-                          {selectedBadge.eco_points_required}
-                        </p>
-                      )}
-                      {selectedBadge.trees_planted_required > 0 && (
-                        <p>
-                          <strong>Árboles Plantados requeridos:</strong>{" "}
-                          {selectedBadge.trees_planted_required}
-                        </p>
-                      )}
-                      {selectedBadge.water_saved_required > 0 && (
-                        <p>
-                          <strong>Agua Ahorrada requerida:</strong>{" "}
-                          {selectedBadge.water_saved_required} L
-                        </p>
-                      )}
-                      {selectedBadge.waste_recycled_required > 0 && (
-                        <p>
-                          <strong>Residuos Reciclados requeridos:</strong>{" "}
-                          {selectedBadge.waste_recycled_required} kg
-                        </p>
-                      )}
+                      <ul>
+                        {selectedBadge.required_challenges > 0 && (
+                          <li className="mb-2">
+                            <strong>Desafíos requeridos:</strong>{" "}
+                            {selectedBadge.required_challenges}{" "}
+                            {userData.activities.length >=
+                            selectedBadge.required_challenges ? (
+                              <span className="text-green-500 ml-2">
+                                ✓ Completado
+                              </span>
+                            ) : (
+                              <span className="text-red-500 ml-2">
+                                ✗ Pendiente
+                              </span>
+                            )}
+                          </li>
+                        )}
+                        {selectedBadge.eco_points_required > 0 && (
+                          <li className="mb-2">
+                            <strong>Puntos Ecológicos requeridos:</strong>{" "}
+                            {selectedBadge.eco_points_required}{" "}
+                            {userData.eco_score >=
+                            selectedBadge.eco_points_required ? (
+                              <span className="text-green-500 ml-2">
+                                ✓ Completado
+                              </span>
+                            ) : (
+                              <span className="text-red-500 ml-2">
+                                ✗ Pendiente
+                              </span>
+                            )}
+                          </li>
+                        )}
+                        {selectedBadge.trees_planted_required > 0 && (
+                          <li className="mb-2">
+                            <strong>Árboles Plantados requeridos:</strong>{" "}
+                            {selectedBadge.trees_planted_required}{" "}
+                            {userData.trees_planted >=
+                            selectedBadge.trees_planted_required ? (
+                              <span className="text-green-500 ml-2">
+                                ✓ Completado
+                              </span>
+                            ) : (
+                              <span className="text-red-500 ml-2">
+                                ✗ Pendiente
+                              </span>
+                            )}
+                          </li>
+                        )}
+                        {selectedBadge.water_saved_required > 0 && (
+                          <li className="mb-2">
+                            <strong>Agua Ahorrada requerida:</strong>{" "}
+                            {selectedBadge.water_saved_required} L{" "}
+                            {userData.water_saved >=
+                            selectedBadge.water_saved_required ? (
+                              <span className="text-green-500 ml-2">
+                                ✓ Completado
+                              </span>
+                            ) : (
+                              <span className="text-red-500 ml-2">
+                                ✗ Pendiente
+                              </span>
+                            )}
+                          </li>
+                        )}
+                        {selectedBadge.waste_recycled_required > 0 && (
+                          <li className="mb-2">
+                            <strong>Residuos Reciclados requeridos:</strong>{" "}
+                            {selectedBadge.waste_recycled_required} kg{" "}
+                            {userData.waste_recycled >=
+                            selectedBadge.waste_recycled_required ? (
+                              <span className="text-green-500 ml-2">
+                                ✓ Completado
+                              </span>
+                            ) : (
+                              <span className="text-red-500 ml-2">
+                                ✗ Pendiente
+                              </span>
+                            )}
+                          </li>
+                        )}
+                      </ul>
                     </div>
                   </div>
                 ) : (
