@@ -1,33 +1,29 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
 import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
-
-const avatars = [
-  { id: 1, src: "/avatars/tree.png", alt: "Tree Avatar" },
-  { id: 2, src: "/avatars/leaf.png", alt: "Leaf Avatar" },
-  { id: 3, src: "/avatars/flower.png", alt: "Flower Avatar" },
-  { id: 4, src: "/avatars/recycle.png", alt: "Recycle Avatar" },
-  { id: 5, src: "/avatars/water-drop.png", alt: "Water Drop Avatar" },
-  { id: 6, src: "/avatars/sun.png", alt: "Sun Avatar" },
-];
 
 const UserProfile = () => {
   const [user, setUser] = useState({
     id: null,
-    name: '',
-    lastname: '',
-    username: '',
-    email: '',
-    phone: '',
+    name: "",
+    lastname: "",
+    username: "",
+    email: "",
+    phone: "",
   });
 
   const [editMode, setEditMode] = useState(false);
@@ -37,6 +33,7 @@ const UserProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState("");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -48,10 +45,10 @@ const UserProfile = () => {
         const userId = decodedToken.id;
 
         const response = await fetch(`http://127.0.0.1:8080/user/${userId}`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
 
@@ -61,7 +58,7 @@ const UserProfile = () => {
 
         const userData = await response.json();
         setUser(userData);
-
+        setSelectedAvatar(userData.avatar || allowedAvatars[0].src);
       } catch (error) {
         console.error("Error al cargar los datos del usuario:", error);
       }
@@ -76,23 +73,23 @@ const UserProfile = () => {
 
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://127.0.0.1:8080/user/${user.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(user),
+        body: JSON.stringify({ ...user, avatar: selectedAvatar }),
       });
 
       if (!response.ok) {
-        throw new Error('Error al actualizar los datos');
+        throw new Error("Error al actualizar los datos");
       }
 
       setEditMode(false);
     } catch (error) {
-      console.error('Error al guardar los cambios:', error);
+      console.error("Error al guardar los cambios:", error);
     }
   };
 
@@ -106,22 +103,27 @@ const UserProfile = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://127.0.0.1:8080/auth/update-password`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          current_password: currentPassword,
-          new_password: newPassword,
-        }), 
-      });
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://127.0.0.1:8080/auth/update-password`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al actualizar la contraseña');
+        throw new Error(
+          errorData.message || "Error al actualizar la contraseña"
+        );
       }
 
       setCurrentPassword("");
@@ -129,7 +131,7 @@ const UserProfile = () => {
       setConfirmPassword("");
       setPasswordSuccess("Contraseña actualizada con éxito");
     } catch (error) {
-      console.error('Error al actualizar la contraseña:', error);
+      console.error("Error al actualizar la contraseña:", error);
       setPasswordError(error.message);
     }
   };
@@ -141,7 +143,6 @@ const UserProfile = () => {
           <div className="flex items-center space-x-4">
             <Avatar className="h-10 w-10 lg:h-20 lg:w-20">
               <AvatarImage
-                src="/placeholder.svg"
                 alt={user.name || "Default"}
               />
               <AvatarFallback>
@@ -228,28 +229,13 @@ const UserProfile = () => {
                       />
                     </div>
                   </div>
-                  <div className="flex justify-end space-x-4 mt-6">
-                    {editMode ? (
-                      <>
-                        <Button
-                          onClick={() => setEditMode(false)}
-                          variant="outline"
-                        >
-                          Cancelar
-                        </Button>
-                        <Button
-                          onClick={handleSave}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          Guardar
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        onClick={handleEdit}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        Editar Perfil
+                  <div className="flex justify-end">
+                    <Button onClick={handleEdit} className="mr-2 bg-green-500 text-white">
+                      {editMode ? "Cancelar" : "Editar"}
+                    </Button>
+                    {editMode && (
+                      <Button onClick={handleSave}  className="bg-green-500 text-white">
+                        Guardar Cambios
                       </Button>
                     )}
                   </div>
@@ -260,7 +246,7 @@ const UserProfile = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-2xl font-semibold text-green-600">
-                    Seguridad
+                    Configuración de Contraseña
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -319,10 +305,10 @@ const UserProfile = () => {
                     </p>
                   )}
                   <Button 
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white "
                     onClick={handlePasswordUpdate}
                   >
-                    <Lock className="mr-2 h-4 w-4" /> Actualizar Contraseña
+                    <Lock className="mr-2 h-4 w-4 text-white" /> Actualizar Contraseña
                   </Button>
                 </CardContent>
               </Card>
