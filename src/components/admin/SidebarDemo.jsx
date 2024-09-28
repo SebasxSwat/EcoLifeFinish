@@ -12,10 +12,13 @@ import ViewProfile from "@/pages/admin/view-profile";
 import AdminUserList from "@/pages/admin/user-list";
 import AverageCarbonFootprint from "@/pages/admin/average-carbon-footprint";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom"; // 
 
 export function SidebarDemo() {
   const [open, setOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
+
+  const navigate = useNavigate();
 
   const links = [
     {
@@ -76,6 +79,11 @@ export function SidebarDemo() {
     setCurrentPage(id);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token'); 
+    navigate('/login'); 
+  };
+
   const renderMainContent = () => {
     switch (currentPage) {
       case "profile":
@@ -124,7 +132,9 @@ export function SidebarDemo() {
                   <SidebarLink
                     key={idx}
                     link={link}
-                    onClick={() => setCurrentPage(link.id)}
+                    onClick={() => {
+                      link.id === 'logout' ? handleLogout() : setCurrentPage(link.id);
+                    }}
                   />
                 )
               )}
