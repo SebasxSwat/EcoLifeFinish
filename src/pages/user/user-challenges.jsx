@@ -121,7 +121,6 @@ const UserChallenges = () => {
   
         setChallenges(prevChallenges => prevChallenges.filter(c => c.id !== challenge.id));
   
-        // Trigger animation
         setCompletedChallenge(challenge);
         setShowAnimation(true);
   

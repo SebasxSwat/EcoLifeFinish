@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Progress } from "@/components/ui/progress"
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Leaf, Car, Bike, Train, Utensils, Recycle, Droplet, Lightbulb } from 'lucide-react'
+import { Leaf, Car, Bike, Train, Utensils, Recycle, Droplet, Lightbulb, AlertTriangle } from 'lucide-react'
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
@@ -30,6 +30,7 @@ export function CuestionarioHuellaCarbono() {
   const [error, setError] = useState(null)
   const [showExitDialog, setShowExitDialog] = useState(false)
   const [isExiting, setIsExiting] = useState(false)
+  const [showWarningModal, setShowWarningModal] = useState(true)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -53,7 +54,7 @@ export function CuestionarioHuellaCarbono() {
   }, [])
 
   const shouldBlockNavigation = useCallback(
-    () => currentQuestion < questions.length - 1,
+    () => currentQuestion < questions.length,
     [currentQuestion]
   )
 
@@ -300,6 +301,23 @@ export function CuestionarioHuellaCarbono() {
             <Button variant="destructive" onClick={handleConfirmNavigation}>
               Salir
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showWarningModal} onOpenChange={setShowWarningModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-6 w-6 text-yellow-500" />
+              Advertencia
+            </DialogTitle>
+            <DialogDescription>
+              Por favor, no salgas del cuestionario hasta que lo hayas completado. Si sales, perderás todo tu progreso y tendrás que empezar de nuevo.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setShowWarningModal(false)}>Entendido</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

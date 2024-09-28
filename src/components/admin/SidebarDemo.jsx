@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import {
   IconArrowLeft,
-  IconBrandTabler,
+  IconHomeBolt,
   IconUsers,
   IconUserBolt,
 } from "@tabler/icons-react";
@@ -22,10 +22,10 @@ export function SidebarDemo() {
 
   const links = [
     {
-      label: "Dashboard",
+      label: "Home",
       id: "dashboard",
       icon: (
-        <IconBrandTabler className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
+        <IconHomeBolt className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
     },
     {
@@ -37,7 +37,7 @@ export function SidebarDemo() {
     },
     {
       label: "User",
-      id: "user",
+      id: "user-list",
       icon: (
         <IconUsers className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
       ),
@@ -81,12 +81,10 @@ export function SidebarDemo() {
       case "profile":
         return <ViewProfile />;
       case "user-list":
-        return <AdminUserList />;
-      case "average-carbon-footprint":
-        return <AverageCarbonFootprint />;
+        return <AdminUserList />
       case "dashboard":
       default:
-        return <DashboardAdmin />;
+        return <AverageCarbonFootprint />;
     }
   };
 
@@ -96,7 +94,7 @@ export function SidebarDemo() {
         <SidebarBody className="justify-between gap-10 bg-gray-800 dark:bg-neutral-900 text-white dark:text-white border-2 border-neutral-700 dark:border-neutral-600 rounded-lg">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-5">
+            <div className="mt-8 flex flex-col gap-8">
               {links.map((link, idx) =>
                 link.submenu ? (
                   <div key={idx}>

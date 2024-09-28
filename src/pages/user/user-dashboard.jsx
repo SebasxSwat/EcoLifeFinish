@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Leaf, TreeDeciduous, Recycle, Droplet, Award } from "lucide-react";
+import { Leaf, TreeDeciduous, Recycle, Droplet, Award, X } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -12,10 +12,17 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import { jwtDecode } from "jwt-decode";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const AVERAGE_CARBON_FOOTPRINT = 4.65;
 
@@ -37,6 +44,7 @@ const UserDashboard = () => {
   });
 
   const [newBadge, setNewBadge] = useState(null);
+  const [selectedBadge, setSelectedBadge] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -153,6 +161,10 @@ const UserDashboard = () => {
     userData.carbon_footprint > AVERAGE_CARBON_FOOTPRINT
       ? "text-red-600"
       : "text-green-600";
+
+  const handleBadgeClick = (badge) => {
+    setSelectedBadge(badge);
+  };
 
   return (
     <div className="container mx-auto p-4 bg-gradient-to-br  to-blue-50 min-h-screen">
@@ -314,7 +326,8 @@ const UserDashboard = () => {
                       {userData.badges.locked.map((badge) => (
                         <div
                           key={badge.id}
-                          className="flex items-center space-x-2"
+                          className="flex items-center space-x-2 cursor-pointer"
+                          onClick={() => handleBadgeClick(badge)}
                         >
                           <Award className="h-8 w-8 text-gray-300" />
                           <span className="text-sm font-medium m-3">
@@ -354,6 +367,79 @@ const UserDashboard = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Dialog
+        open={!!selectedBadge}
+        onOpenChange={() => setSelectedBadge(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-white justify-between">
+              <span>Requisitos de la Insignia</span>
+              <Button
+                size="icon"
+                onClick={() => setSelectedBadge(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          {selectedBadge && (
+            <>
+              <div className="flex items-center space-x-4 mb-4">
+                <Award className="h-12 w-12 text-gray-300" />
+                <h3 className="text-xl text-white font-semibold">
+                  {selectedBadge.name}
+                </h3>
+              </div>
+              <DialogDescription>
+                {selectedBadge ? (
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-600">
+                      {selectedBadge.name}
+                    </h3>
+                    <p className="mt-2">{selectedBadge.description}</p>
+                    <div className="mt-4">
+                      {selectedBadge.required_challenges > 0 && (
+                        <p>
+                          <strong>Desafíos requeridos:</strong>{" "}
+                          {selectedBadge.required_challenges}
+                        </p>
+                      )}
+                      {selectedBadge.eco_points_required > 0 && (
+                        <p>
+                          <strong>Puntos Ecológicos requeridos:</strong>{" "}
+                          {selectedBadge.eco_points_required}
+                        </p>
+                      )}
+                      {selectedBadge.trees_planted_required > 0 && (
+                        <p>
+                          <strong>Árboles Plantados requeridos:</strong>{" "}
+                          {selectedBadge.trees_planted_required}
+                        </p>
+                      )}
+                      {selectedBadge.water_saved_required > 0 && (
+                        <p>
+                          <strong>Agua Ahorrada requerida:</strong>{" "}
+                          {selectedBadge.water_saved_required} L
+                        </p>
+                      )}
+                      {selectedBadge.waste_recycled_required > 0 && (
+                        <p>
+                          <strong>Residuos Reciclados requeridos:</strong>{" "}
+                          {selectedBadge.waste_recycled_required} kg
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <p>Cargando...</p>
+                )}
+              </DialogDescription>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

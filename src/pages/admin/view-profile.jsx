@@ -1,99 +1,323 @@
-export default function ViewProfile() {
+"use client";
+
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
+import { jwtDecode } from "jwt-decode";
+
+const UserProfile = () => {
+  const [user, setUser] = useState({
+    id: null,
+    name: "",
+    lastname: "",
+    username: "",
+    email: "",
+    phone: "",
+  });
+
+  const [editMode, setEditMode] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Token no encontrado");
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.id;
+
+        const response = await fetch(`http://127.0.0.1:8080/user/${userId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos del usuario");
+        }
+
+        const userData = await response.json();
+        setUser(userData);
+        setSelectedAvatar(userData.avatar || allowedAvatars[0].src);
+      } catch (error) {
+        console.error("Error al cargar los datos del usuario:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleEdit = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://127.0.0.1:8080/user/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...user, avatar: selectedAvatar }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar los datos");
+      }
+
+      setEditMode(false);
+    } catch (error) {
+      console.error("Error al guardar los cambios:", error);
+    }
+  };
+
+  const handlePasswordUpdate = async () => {
+    setPasswordError("");
+    setPasswordSuccess("");
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Las contraseñas nuevas no coinciden");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://127.0.0.1:8080/auth/update-password`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Error al actualizar la contraseña"
+        );
+      }
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordSuccess("Contraseña actualizada con éxito");
+    } catch (error) {
+      console.error("Error al actualizar la contraseña:", error);
+      setPasswordError(error.message);
+    }
+  };
+
   return (
-    <div className="flex flex-col justify-start items-start h-screen ml-4 sm:ml-20 gap-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4 h-auto sm:h-28 p-4 text-white font-bold text-xl sm:text-3xl bg-gray-800 rounded-lg">
-        <h1>Perfil de Administrador</h1>
-        <div className="flex gap-2 text-gray-600 hover:scale-110 duration-200 hover:cursor-pointer">
-          <svg
-            className="w-5 sm:w-6 stroke-green-700"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-          <button className="font-semibold text-sm sm:text-lg text-green-700">
-            Editar Perfil
-          </button>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="flex flex-col sm:flex-row justify-start items-start py-3 w-full bg-gray-800 rounded-lg">
-        {/* Info containers */}
-        <div className="flex flex-col gap-10 sm:gap-14 p-5 sm:p-10">
-          {/* Nombre Completo */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center p-4 gap-4 sm:gap-10 w-full sm:w-80 text-white font-bold bg-gray-800 rounded-lg">
+    <div className="container mx-auto p-4 bg-gradient-to-br to-blue-50 min-h-screen">
+      <Card className="w-full max-w-4xl mx-auto shadow-lg dark:bg-black">
+        <CardHeader className="pb-4">
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-10 w-10 lg:h-20 lg:w-20">
+              <AvatarImage
+                alt={user.name || "Default"}
+              />
+              <AvatarFallback>
+                {user.name?.charAt(0).toUpperCase() || "D"}
+              </AvatarFallback>
+            </Avatar>
             <div>
-              <svg
-                className="w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] fill-[#8e8e8e]"
-                viewBox="0 0 448 512"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"></path>
-              </svg>
-            </div>
-            <div className="flex flex-col gap-3">
-              <h1 className="text-xs sm:text-sm">Nombre Completo:</h1>
-              <label
-                htmlFor="text"
-                className="w-full sm:w-auto min-w-44 h-7 rounded-lg bg-white text-black text-xs sm:text-sm p-1"
-              >
-                Sebastian Escalante
-              </label>
+              <CardTitle className="text-3xl font-bold text-green-600">
+                {user.name} {user.lastname}
+              </CardTitle>
+              <CardDescription className="text-lg text-green-700">
+                Perfil de Administrador EcoLife
+              </CardDescription>
             </div>
           </div>
-
-          {/* Correo Electrónico */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center p-4 gap-4 sm:gap-10 w-full sm:w-80 text-white font-bold bg-gray-800 rounded-lg">
-            <div>
-              <svg
-                className="w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] fill-[#8e8e8e]"
-                viewBox="0 0 512 512"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"></path>
-              </svg>
-            </div>
-            <div className="flex flex-col gap-3">
-              <h1 className="text-xs sm:text-sm">Correo Electrónico:</h1>
-              <label
-                htmlFor="email"
-                className="w-full sm:w-auto min-w-44 h-7 rounded-lg bg-white text-black text-xs sm:text-sm p-1"
-              >
-                sebastian@example.com
-              </label>
-            </div>
-          </div>
-
-          {/* Número de Teléfono */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center p-4 gap-4 sm:gap-10 w-full sm:w-80 text-white font-bold bg-gray-800 rounded-lg">
-            <div>
-              <svg
-                className="w-[40px] sm:w-[50px] h-[40px] sm:h-[50px] fill-[#8e8e8e]"
-                viewBox="0 0 512 512"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"></path>
-              </svg>
-            </div>
-            <div className="flex flex-col gap-3">
-              <h1 className="text-xs sm:text-sm">Número de Teléfono:</h1>
-              <label
-                htmlFor="phone"
-                className="w-full sm:w-auto min-w-44 h-7 rounded-lg bg-white text-black text-xs sm:text-sm p-1"
-              >
-                +57 3144073535
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="personal" className="w-full">
+            <TabsList className="grid w-full h-12 grid-cols-2 mb-8">
+              <TabsTrigger value="personal">Información Personal</TabsTrigger>
+              <TabsTrigger value="settings">Configuración</TabsTrigger>
+            </TabsList>
+            <TabsContent value="personal">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl font-semibold text-green-600">
+                    Información Personal
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <User className="h-5 w-5 text-green-600" />
+                    <div className="flex-grow">
+                      <Label htmlFor="name">Nombre</Label>
+                      <Input
+                        id="name"
+                        value={user.name}
+                        disabled={!editMode}
+                        onChange={(e) =>
+                          setUser({ ...user, name: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <User className="h-5 w-5 text-green-600" />
+                    <div className="flex-grow">
+                      <Label htmlFor="lastname">Apellido</Label>
+                      <Input
+                        id="lastname"
+                        value={user.lastname}
+                        disabled={!editMode}
+                        onChange={(e) =>
+                          setUser({ ...user, lastname: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Mail className="h-5 w-5 text-green-600" />
+                    <div className="flex-grow">
+                      <Label htmlFor="email">Correo Electrónico</Label>
+                      <Input
+                        id="email"
+                        value={user.email}
+                        disabled={!editMode}
+                        onChange={(e) =>
+                          setUser({ ...user, email: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Phone className="h-5 w-5 text-green-600" />
+                    <div className="flex-grow">
+                      <Label htmlFor="phone">Teléfono</Label>
+                      <Input
+                        id="phone"
+                        value={user.phone}
+                        disabled={!editMode}
+                        onChange={(e) =>
+                          setUser({ ...user, phone: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button onClick={handleEdit} className="mr-2 bg-green-500 text-white">
+                      {editMode ? "Cancelar" : "Editar"}
+                    </Button>
+                    {editMode && (
+                      <Button onClick={handleSave}  className="bg-green-500 text-white">
+                        Guardar Cambios
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="settings">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl font-semibold text-green-600">
+                    Configuración de Contraseña
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="current-password">Contraseña Actual</Label>
+                    <div className="relative">
+                      <Input
+                        id="current-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Contraseña actual"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password">Nueva Contraseña</Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      placeholder="Ingresa tu nueva contraseña"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirmar Nueva Contraseña</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="Confirma tu nueva contraseña"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </div>
+                  {passwordError && (
+                    <p className="text-sm text-red-600" role="alert">
+                      {passwordError}
+                    </p>
+                  )}
+                  {passwordSuccess && (
+                    <p className="text-sm text-green-600" role="alert">
+                      {passwordSuccess}
+                    </p>
+                  )}
+                  <Button 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white "
+                    onClick={handlePasswordUpdate}
+                  >
+                    <Lock className="mr-2 h-4 w-4 text-white" /> Actualizar Contraseña
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
-}
+};
+
+export default UserProfile;
