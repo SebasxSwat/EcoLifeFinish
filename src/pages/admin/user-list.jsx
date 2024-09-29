@@ -109,7 +109,7 @@ export default function AdminUserList() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0 text-gray-600 dark:text-gray-400 hover:bg-green-100 dark:hover:bg-gray-700">
-                        <span className="sr-only">Abrir menú</span>
+                        <span className="sr-only">Abrir</span>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
