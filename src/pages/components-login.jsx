@@ -122,7 +122,7 @@ const Login = () => {
           </p>
           <p className="text-sm text-gray-600">
             ¿Olvidaste tu contraseña?{" "}
-            <Link to="/recuperar-contrasena" className="text-green-600 hover:underline">
+            <Link to="/recuperar" className="text-green-600 hover:underline">
               Recupérala aquí
             </Link>
           </p>

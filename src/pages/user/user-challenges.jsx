@@ -39,11 +39,13 @@ const UserChallenges = () => {
     const savedTrees = localStorage.getItem('treesPlanted') || 0;
     const savedWater = localStorage.getItem('waterSaved') || 0;
     const savedWaste = localStorage.getItem('wasteRecycled') || 0;
-
+  
     setTreesPlanted(parseInt(savedTrees, 10));
     setWaterSaved(parseInt(savedWater, 10));
     setWasteRecycled(parseInt(savedWaste, 10));
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Mantener el array vacío si fetchChallenges es estable
+  
 
   useEffect(() => {
     localStorage.setItem('treesPlanted', treesPlanted);
@@ -199,11 +201,11 @@ const UserChallenges = () => {
     <div className="container mx-auto p-4 bg-gradient-to-br min-h-screen">
       <Card className="w-full max-w-4xl mx-auto shadow-lg">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-green-800 dark:text-green-400 flex items-center">
-            <Leaf className="h-8 w-8 mr-2" />
+          <CardTitle className="text-3xl font-bold text-green-600 dark:text-green-600 flex items-center">
+            <Leaf className="h-8 w-8 mr-2 text-green-600" />
             Desafíos EcoLife
           </CardTitle>
-          <CardDescription className="text-lg text-green-600 dark:text-green-300">
+          <CardDescription className="text-lg text-green-600 dark:text-green-600">
             Completa desafíos para ganar EcoPoints y hacer un impacto positivo
           </CardDescription>
         </CardHeader>

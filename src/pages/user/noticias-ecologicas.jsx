@@ -50,7 +50,6 @@ const NoticiasEcologicas = () => {
   const obtenerNoticias = () => {
     setCargando(true);
     setTimeout(() => {
-      // Seleccionar aleatoriamente 3 noticias
       const mezcladas = datosNoticias.sort(() => 0.5 - Math.random());
       setNoticias(mezcladas.slice(0, 3));
       setCargando(false);
@@ -68,7 +67,7 @@ const NoticiasEcologicas = () => {
       <Card className="w-full max-w-4xl mx-auto shadow-lg">
         <CardHeader>
           <CardTitle className="text-3xl font-bold text-green-800 flex items-center justify-between">
-            <span className="flex items-center">
+            <span className="flex items-center text-green-600">
               <Leaf className="h-8 w-8 mr-2" />
               Noticias Ecológicas
             </span>
@@ -76,7 +75,7 @@ const NoticiasEcologicas = () => {
               <RefreshCcw className="h-4 w-4" />
             </Button>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-white">
             Mantente al día con las últimas noticias ambientales y avances ecológicos
           </CardDescription>
         </CardHeader>
@@ -91,20 +90,20 @@ const NoticiasEcologicas = () => {
               {noticias.map((item) => (
                 <Card key={item.id}>
                   <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-green-700">{item.titulo}</CardTitle>
-                    <CardDescription className="text-sm text-gray-500">
+                    <CardTitle className="text-xl font-semibold text-green-600">{item.titulo}</CardTitle>
+                    <CardDescription className="text-sm text-white">
                       {item.fuente} - {item.fecha}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-500">{item.resumen}</p>
+                    <p className="text-gray-200">{item.resumen}</p>
                   </CardContent>
                 </Card>
               ))}
             </div>
           )}
         </CardContent>
-        <CardFooter className="text-center text-sm text-gray-500">
+        <CardFooter className="text-center text-sm text-gray-400">
           Las noticias se actualizan cada 5 minutos. Última actualización: {new Date().toLocaleTimeString()}
         </CardFooter>
       </Card>
