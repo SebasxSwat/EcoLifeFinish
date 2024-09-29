@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { jwtDecode } from 'jwt-decode'
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Progress } from "@/components/ui/progress"
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Leaf, Car, Bike, Train, Utensils, Recycle, Droplet, Lightbulb, AlertTriangle } from 'lucide-react'
+import { Leaf, Car, Bike, Train, Utensils, Recycle, Droplet, Lightbulb, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
-export function CuestionarioHuellaCarbono() {
+const CuestionarioHuellaCarbono = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -105,7 +105,8 @@ export function CuestionarioHuellaCarbono() {
       icon: <Lightbulb className="w-8 h-8 text-yellow-400" />,
       field: "consumoElectrico",
       min: "Bajo",
-      max: "Alto"
+      max: "Alto",
+      info: "Considera el uso de electrodomésticos, iluminación y dispositivos electrónicos."
     },
     {
       title: "Transporte",
@@ -113,7 +114,8 @@ export function CuestionarioHuellaCarbono() {
       icon: <Car className="w-8 h-8 text-blue-500" />,
       field: "tipoTransporte",
       min: <Bike className="w-6 h-6" />,
-      max: <Car className="w-6 h-6" />
+      max: <Car className="w-6 h-6" />,
+      info: "Piensa en tus desplazamientos diarios y viajes frecuentes."
     },
     {
       title: "Consumo de Carne",
@@ -121,7 +123,8 @@ export function CuestionarioHuellaCarbono() {
       icon: <Utensils className="w-8 h-8 text-red-500" />,
       field: "consumoCarne",
       min: "Nunca",
-      max: "Diario"
+      max: "Diario",
+      info: "Incluye todo tipo de carnes en tu dieta."
     },
     {
       title: "Reciclaje",
@@ -129,7 +132,8 @@ export function CuestionarioHuellaCarbono() {
       icon: <Recycle className="w-8 h-8 text-green-500" />,
       field: "reciclaje",
       min: "Nunca",
-      max: "Siempre"
+      max: "Siempre",
+      info: "Considera la separación de residuos en tu hogar y lugar de trabajo."
     },
     {
       title: "Consumo de Agua",
@@ -137,7 +141,8 @@ export function CuestionarioHuellaCarbono() {
       icon: <Droplet className="w-8 h-8 text-blue-400" />,
       field: "consumoAgua",
       min: "Bajo",
-      max: "Alto"
+      max: "Alto",
+      info: "Incluye el uso de agua en duchas, lavado de ropa, riego, etc."
     },
     {
       title: "Compras Online",
@@ -145,7 +150,8 @@ export function CuestionarioHuellaCarbono() {
       icon: <Train className="w-8 h-8 text-purple-500" />,
       field: "comprasOnline",
       min: "Raramente",
-      max: "Frecuentemente"
+      max: "Frecuentemente",
+      info: "Piensa en la frecuencia de tus pedidos y envíos a domicilio."
     }
   ]
 
@@ -158,6 +164,12 @@ export function CuestionarioHuellaCarbono() {
       setCurrentQuestion(currentQuestion + 1)
     } else {
       handleSubmit()
+    }
+  }
+
+  const handlePrevious = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1)
     }
   }
 
@@ -219,15 +231,22 @@ export function CuestionarioHuellaCarbono() {
   }
 
   if (isLoading) {
-    return <div>Cargando...</div>
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
+      <div className="container mx-auto p-4 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
     )
   }
 
@@ -243,84 +262,70 @@ export function CuestionarioHuellaCarbono() {
             <CardDescription>Responde a estas preguntas para calcular tu impacto ambiental.</CardDescription>
           </CardHeader>
           <CardContent>
-            <motion.div
-              key={currentQuestion}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-green-700 flex items-center gap-2">
-                    {questions[currentQuestion].icon}
-                    {questions[currentQuestion].title}
-                  </h3>
-                  <span className="text-sm text-gray-500">
-                    {currentQuestion + 1} / {questions.length}
-                  </span>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQuestion}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2 mb-2">
+                  {questions[currentQuestion].icon}
+                  {questions[currentQuestion].title}
+                </h2>
+                <p className="text-gray-500 mb-4">{questions[currentQuestion].description}</p>
+                <div className="mb-6">
+                  <Slider
+                    defaultValue={[50]}
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={[respuestas[questions[currentQuestion].field]]}
+                    onValueChange={(value) => handleSliderChange(value, questions[currentQuestion].field)}
+                  />
                 </div>
-                <Progress value={(currentQuestion + 1) / questions.length * 100} className="h-2" />
-              </div>
-              <p className="text-gray-600 mb-4">{questions[currentQuestion].description}</p>
-              <div className="space-y-4">
-                <Slider
-                  value={[respuestas[questions[currentQuestion].field]]}
-                  onValueChange={(value) => handleSliderChange(value, questions[currentQuestion].field)}
-                  max={100}
-                  step={1}
-                />
-                <div className="flex justify-between text-sm text-gray-500">
+                <div className="flex justify-between text-xs text-gray-500 mb-4">
                   <span>{questions[currentQuestion].min}</span>
                   <span>{questions[currentQuestion].max}</span>
                 </div>
-              </div>
-            </motion.div>
-            <Button 
-              onClick={handleNext} 
-              className="w-full mt-6 bg-green-600 hover:bg-green-700"
-            >
-              {currentQuestion < questions.length - 1 ? "Siguiente" : "Calcular y Guardar"}
-            </Button>
+                <p className="text-sm text-gray-600 mb-4">{questions[currentQuestion].info}</p>
+                <Progress value={((currentQuestion + 1) / questions.length) * 100} className="mb-4" />
+              </motion.div>
+            </AnimatePresence>
           </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button onClick={handlePrevious} disabled={currentQuestion === 0} variant="outline">
+              <ChevronLeft className="mr-2 h-4 w-4" /> Anterior
+            </Button>
+            <Button onClick={handleNext} variant="primary">
+              {currentQuestion < questions.length - 1 ? (
+                <>
+                  Siguiente <ChevronRight className="ml-2 h-4 w-4" />
+                </>
+              ) : (
+                'Enviar'
+              )}
+            </Button>
+          </CardFooter>
         </Card>
       </div>
-
       <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>¿Estás seguro que deseas salir?</DialogTitle>
+            <DialogTitle>Salir del Cuestionario</DialogTitle>
             <DialogDescription>
-              Si sales ahora, perderás todo el progreso en el cuestionario. ¿Estás seguro de que quieres continuar?
+              ¿Estás seguro de que quieres salir? Se perderán tus respuestas.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={handleCancelNavigation}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleConfirmNavigation}>
-              Salir
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showWarningModal} onOpenChange={setShowWarningModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-6 w-6 text-yellow-500" />
-              Advertencia
-            </DialogTitle>
-            <DialogDescription>
-              Por favor, no salgas del cuestionario hasta que lo hayas completado. Si sales, perderás todo tu progreso y tendrás que empezar de nuevo.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setShowWarningModal(false)}>Entendido</Button>
+            <Button onClick={handleCancelNavigation} variant="secondary">Cancelar</Button>
+            <Button onClick={handleConfirmNavigation} variant="destructive">Salir</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
   )
 }
+
+export default CuestionarioHuellaCarbono
