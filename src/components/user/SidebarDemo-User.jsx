@@ -14,7 +14,8 @@ import { motion } from "framer-motion";
 import UserDashboard from "@/pages/user/user-dashboard";
 import UserProfile from "@/pages/user/user-profile";
 import UserChallenges from "@/pages/user/user-challenges";
-import { NoticiasEcologicas } from "@/pages/user/noticias-ecologicas";
+import NoticiasEcologicas from "@/pages/user/noticias-ecologicas";
+
 export function SidebarDemoUser() {
   const [open, setOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState("dashboard");

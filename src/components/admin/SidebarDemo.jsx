@@ -7,7 +7,6 @@ import {
   IconUserBolt,
 } from "@tabler/icons-react";
 import { DarkMode } from "../ui/darkMode";
-import { DashboardAdmin } from "@/pages/admin/admin-dashboard";
 import ViewProfile from "@/pages/admin/view-profile";
 import AdminUserList from "@/pages/admin/user-list";
 import AverageCarbonFootprint from "@/pages/admin/average-carbon-footprint";
