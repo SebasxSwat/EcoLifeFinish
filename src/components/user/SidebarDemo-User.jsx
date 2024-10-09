@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import {
   IconArrowLeft,
-  IconBrandTabler,
   IconTrophy,
   IconUserBolt,
   IconNews,
+  IconBuildingStore
 } from "@tabler/icons-react";
 import { House } from "lucide-react";
 import { DarkMode } from "../ui/darkMode";
@@ -15,6 +15,7 @@ import UserDashboard from "@/pages/user/user-dashboard";
 import UserProfile from "@/pages/user/user-profile";
 import UserChallenges from "@/pages/user/user-challenges";
 import NoticiasEcologicas from "@/pages/user/noticias-ecologicas";
+import EcoMarket from "@/pages/user/components-eco-market";
 
 export function SidebarDemoUser() {
   const [open, setOpen] = useState(false);
@@ -83,6 +84,13 @@ export function SidebarDemoUser() {
       ),
     },
     {
+      label: "EcoMarket",
+      id: "ecomarket",
+      icon: (
+        <IconBuildingStore className="text-white dark:text-white h-8 w-10 flex-shrink-0" />
+      ),
+    },
+    {
       label: "Logout",
       id: "logout",
       icon: (
@@ -100,6 +108,8 @@ export function SidebarDemoUser() {
         return <UserChallenges />;
       case "noticias":
         return <NoticiasEcologicas />;
+      case "ecomarket":
+        return <EcoMarket />;
       default:
         return <UserDashboard />;
     }

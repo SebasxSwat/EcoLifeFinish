@@ -75,7 +75,7 @@ const NoticiasEcologicas = () => {
               <RefreshCcw className="h-4 w-4" />
             </Button>
           </CardTitle>
-          <CardDescription className="text-white">
+          <CardDescription className="text-gray-800">
             Mantente al día con las últimas noticias ambientales y avances ecológicos
           </CardDescription>
         </CardHeader>
@@ -91,12 +91,12 @@ const NoticiasEcologicas = () => {
                 <Card key={item.id}>
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold text-green-600">{item.titulo}</CardTitle>
-                    <CardDescription className="text-sm text-white">
+                    <CardDescription className="text-sm text-gray-800">
                       {item.fuente} - {item.fecha}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-200">{item.resumen}</p>
+                    <p className="text-gray-800">{item.resumen}</p>
                   </CardContent>
                 </Card>
               ))}
